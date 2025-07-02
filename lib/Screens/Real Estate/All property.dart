@@ -2,12 +2,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:verify/Screens/Real%20Estate/search.dart';
 import 'package:verify/custom_widget/back_button.dart';
-import '../../Themes/mode button.dart';
 import '../../Themes/theme-helper.dart';
+import '../../custom_widget/FilterBar.dart';
 import '../../custom_widget/Paths.dart';
-import '../../model/Home_model.dart';
+import '../../custom_widget/Searchbar.dart';
+import '../../model/All_model.dart';
 import 'Sub_Srceen/PropertyBylist.dart';
+import 'Sub_Srceen/Types/Flat.dart';
+import 'Sub_Srceen/Types/Godown.dart';
+import 'Sub_Srceen/Types/Office.dart';
+import 'Sub_Srceen/Types/farmhouse.dart';
+import 'Sub_Srceen/Types/shop.dart';
 import 'Sub_Srceen/full property.dart';
 
 class AllProperty extends StatefulWidget {
@@ -19,21 +26,19 @@ class AllProperty extends StatefulWidget {
 
 class _AllPropertyState extends State<AllProperty> {
   String _number = '';
-  Future<List<Catid>>? _futureData;
-  List<Catid> allProperties = [];
-  List<Catid> filteredProperties = [];
+  Future<List<AllModel>>? _futureData;
+  List<AllModel> allProperties = [];
+  List<AllModel> filteredProperties = [];
   bool isLoading = false;
   bool hasTyped = false;
   TextEditingController searchController = TextEditingController();
 
 
   final List<Map<String, dynamic>> propertyTypes = [
-    {'label': 'House', 'icon': Icons.house, 'selected': false},
     {'label': 'Flat', 'icon': Icons.apartment, 'selected': false},
     {'label': 'Farmhouse', 'icon': Icons.cottage, 'selected': false},
     {'label': 'Office', 'icon': Icons.location_city, 'selected': false},
     {'label': 'Shop', 'icon': Icons.warehouse_outlined, 'selected': false},
-    {'label': 'Apartment', 'icon': Icons.apartment_sharp, 'selected': false},
     {'label': 'Godown', 'icon': Icons.warehouse, 'selected': false},
   ];
 
@@ -53,16 +58,16 @@ class _AllPropertyState extends State<AllProperty> {
     });
   }
 
-  Future<List<Catid>> fetchData() async {
+  Future<List<AllModel>> fetchData() async {
     final url = Uri.parse(
-      "https://verifyserve.social/WebService4.asmx/show_RealEstate_by_fieldworkarnumber?fieldworkarnumber=9711775300&looking=Flat",
+      "https://verifyserve.social/PHP_Files/show_all_category_website_data/show_all_category_data.php",
     );
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
       data.sort((a, b) => b['PVR_id'].compareTo(a['PVR_id']));
-      return data.map((item) => Catid.FromJson(item)).toList();
+      return data.map((item) => AllModel.FromJson(item)).toList();
     } else {
       throw Exception('Failed to load data');
     }
@@ -85,29 +90,47 @@ class _AllPropertyState extends State<AllProperty> {
       isLoading = false;
     });
   }
-  void handleTap(int index) async { // click
+  void handleTap(int index) async {
     setState(() {
       propertyTypes[index]['selected'] = true;
     });
 
-    await Future.delayed(Duration(milliseconds: 300)); // blue highlight for 0.3 sec
+    await Future.delayed(const Duration(milliseconds: 300));
 
     setState(() {
       propertyTypes[index]['selected'] = false;
     });
 
-
     final selectedType = propertyTypes[index]['label'];
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-        //AllProperty(),
-        PropertyListByType(type: selectedType),
-      ),
-    );
+    // 🚀 Navigate to dedicated pages
+    if (selectedType == 'Office') {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const OfficePropertyPage()));
+    }
+    else if (selectedType == 'Godown') {
+       Navigator.push(context, MaterialPageRoute(builder: (_) => const GodownPropertyPage()));
+    }
+    else if (selectedType == 'Shop') {
+       Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopPropertyPage()));
+    }
+
+    else if (selectedType == 'Farmhouse') {
+       Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmhousePropertyPage()));
+    }
+    else if (selectedType == 'Flat') {
+       Navigator.push(context, MaterialPageRoute(builder: (_) => const FlatPropertyPage()));
+    }
+    else {
+      // Fallback
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PropertyListByType(type: selectedType),
+        ),
+      );
+    }
   }
+
 
   // void handleTap(int index) {  //hold
   //   setState(() {
@@ -141,23 +164,35 @@ class _AllPropertyState extends State<AllProperty> {
                   ],
                 ),
               ),
-
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextField(
-                  controller: searchController,
-                  onChanged: _filterResults,
-                  decoration: InputDecoration(
-                    hintText: "Search by location or BHK...",
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    filled: true,
-                    fillColor: AppColors.bgColor(context),
-                  ),
-                ),
-              ),
+               Container(
+                    margin: EdgeInsets.all(20.0),
+                    child:
+                    // InkWell(
+                    //     onTap: (){
+                    //       Navigator.push(context, MaterialPageRoute(builder: (context)
+                    //       => Search(),
+                    //       ));
+                    //     },
+                    //     child:
+                    NeumorphicFilterBar(icon: Icons.search, navigateTo: FilterProperty())
+               ),
+              //
+              // Padding(
+              //   padding: const EdgeInsets.all(16),
+              //   child: TextField(
+              //     controller: searchController,
+              //     onChanged: _filterResults,
+              //     decoration: InputDecoration(
+              //       hintText: "Search by location or BHK...",
+              //       prefixIcon: const Icon(Icons.search),
+              //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              //       filled: true,
+              //       fillColor: AppColors.bgColor(context),
+              //     ),
+              //   ),
+              // ),
               SizedBox(
-                height: 120,
+                height: 85,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -244,7 +279,7 @@ class _AllPropertyState extends State<AllProperty> {
                 ),
               ),
               Expanded(
-                child: FutureBuilder<List<Catid>>(
+                child: FutureBuilder<List<AllModel>>(
                   future: _futureData,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -267,7 +302,7 @@ class _AllPropertyState extends State<AllProperty> {
                     final data = snapshot.data!;
                     return ListView.builder(
                       itemCount: data.length,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(10),
                       itemBuilder: (context, index) {
                         final item = data[index];
                         return propertyCard(item);
@@ -281,11 +316,11 @@ class _AllPropertyState extends State<AllProperty> {
         ));
   }
 
-  Widget propertyCard(Catid item) {
+  Widget propertyCard(AllModel item) {
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('id_Building', item.id);
+        prefs.setInt('id_Building', item.id as int);
         prefs.setString('id_Longitude', item.Longitude);
         prefs.setString('id_Latitude', item.Latitude);
         Navigator.push(context, MaterialPageRoute(builder: (context)
@@ -345,7 +380,7 @@ class _AllPropertyState extends State<AllProperty> {
                         ),
                       ),
                       Text(
-                        "₹${item.Rent + item.Verify_price}",
+                        "₹${item.Rent} - ${item.Verify_price}",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

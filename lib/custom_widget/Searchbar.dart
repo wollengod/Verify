@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 
 class NeumorphicSearchBar extends StatelessWidget {
-  final bool isDark;
-
-  const NeumorphicSearchBar({super.key, this.isDark = false});
+  final String HintText;
+  const NeumorphicSearchBar({
+    super.key,
+    required this.HintText,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final bgColor = isDark ? const Color(0xFF0D0D1F) : const Color(0xFFF0F2F7);
     final boxColor = isDark ? const Color(0xFF13132C) : Colors.white;
     final borderGradient = LinearGradient(
       colors: isDark
-          ? [Color(0xFF00CFFF), Color(0xFF0055FF)] // neon blue tones
+          ? [Color(0xFF00CFFF), Color(0xFF0055FF)]
           : [Color(0xFF00A6FF), Color(0xFF007BFF)],
-
     );
 
     return Center(
@@ -45,26 +48,26 @@ class NeumorphicSearchBar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const SizedBox(width: 20),
-              const Expanded(
+              const SizedBox(width: 30),
+               Expanded(
                 child: TextField(
                   style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
-                    hintText: "Ask me anything...",
+                    hintText: HintText,
                     hintStyle: TextStyle(color: Colors.grey),
                     border: InputBorder.none,
                   ),
                 ),
               ),
               Container(
-                margin: const EdgeInsets.only(right: 12),
+                margin: const EdgeInsets.only(right: 4),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: isDark ? Colors.blueAccent : Colors.blue,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.send_rounded,
+                  Icons.search_sharp,
                   size: 20,
                   color: Colors.white,
                 ),

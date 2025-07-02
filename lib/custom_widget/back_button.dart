@@ -12,8 +12,8 @@ class CustomBackButton extends StatelessWidget {
     this.onPressed,
     this.iconColor = Colors.white,
     this.backgroundColor = Colors.black,
-    this.height = 25,
-    this.width = 25,
+    this.height = 30,
+    this.width = 30,
   });
 
   @override

@@ -1,4 +1,3 @@
-// Inside lib/Screens/sub_screens/PropertyListByType.dart
 import 'package:flutter/material.dart';
 
 class PropertyListByType extends StatelessWidget {
@@ -9,8 +8,7 @@ class PropertyListByType extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('$type Properties')),
-      body: Center(child: Text('Listing properties for: $type')),
+      body: Center(child: Text('Listing properties for: $type',style: TextStyle(fontFamily: 'Poppins'),)),
     );
   }
 }

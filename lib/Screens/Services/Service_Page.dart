@@ -16,6 +16,6 @@ class ServicesPage extends StatelessWidget {
       ),
     body: Center(
       child:
-        Text("Services Coming Soon",style: TextStyle(color: AppColors.textColor(context),fontSize: 20,fontFamily: 'Poppins',),),
+        Text("Services Page",style: TextStyle(color: AppColors.textColor(context),fontSize: 20,fontFamily: 'Poppins',),),
   ));
 }
