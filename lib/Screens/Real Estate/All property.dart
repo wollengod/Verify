@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:verify/Screens/Real%20Estate/search.dart';
+import 'package:verify/Screens/Real%20Estate/filter.dart';
 import 'package:verify/custom_widget/back_button.dart';
 import '../../Themes/theme-helper.dart';
 import '../../custom_widget/FilterBar.dart';
 import '../../custom_widget/Paths.dart';
-import '../../custom_widget/Searchbar.dart';
 import '../../model/All_model.dart';
 import 'Sub_Srceen/PropertyBylist.dart';
 import 'Sub_Srceen/Types/Flat.dart';
@@ -66,30 +65,13 @@ class _AllPropertyState extends State<AllProperty> {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
-      data.sort((a, b) => b['PVR_id'].compareTo(a['PVR_id']));
+      //data.sort((a, b) => b['PVR_id'].compareTo(a['PVR_id']));
       return data.map((item) => AllModel.FromJson(item)).toList();
     } else {
       throw Exception('Failed to load data');
     }
   }
-  void _filterResults(String query) {
-    setState(() {
-      hasTyped = query.isNotEmpty;
-      isLoading = true;
-    });
 
-    final results = allProperties.where((item) {
-      final name = item.Building_Location.toLowerCase();
-      final bhk = item.BHK.toLowerCase();
-      return name.contains(query.toLowerCase()) ||
-          bhk.contains(query.toLowerCase());
-    }).toList();
-
-    setState(() {
-      filteredProperties = results;
-      isLoading = false;
-    });
-  }
   void handleTap(int index) async {
     setState(() {
       propertyTypes[index]['selected'] = true;
@@ -103,22 +85,21 @@ class _AllPropertyState extends State<AllProperty> {
 
     final selectedType = propertyTypes[index]['label'];
 
-    // 🚀 Navigate to dedicated pages
     if (selectedType == 'Office') {
       Navigator.push(context, MaterialPageRoute(builder: (_) => const OfficePropertyPage()));
     }
     else if (selectedType == 'Godown') {
-       Navigator.push(context, MaterialPageRoute(builder: (_) => const GodownPropertyPage()));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const GodownPropertyPage()));
     }
     else if (selectedType == 'Shop') {
-       Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopPropertyPage()));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopPropertyPage()));
     }
 
     else if (selectedType == 'Farmhouse') {
-       Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmhousePropertyPage()));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmhousePropertyPage()));
     }
     else if (selectedType == 'Flat') {
-       Navigator.push(context, MaterialPageRoute(builder: (_) => const FlatPropertyPage()));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const FlatPropertyPage()));
     }
     else {
       // Fallback
@@ -147,172 +128,128 @@ class _AllPropertyState extends State<AllProperty> {
     return SafeArea(
         child: Scaffold(
           backgroundColor: AppColors.bgColor(context),
-          body:  _futureData == null
+          appBar: AppBar(
+            leading: CustomBackButton(),
+            title: Image.asset(AppImages.appbar, height: 70),
+            centerTitle: true,
+            backgroundColor: Colors.black,
+    bottom: PreferredSize(
+    preferredSize: Size.fromHeight(100), // height of bottom
+    child: Container(
+      margin: const EdgeInsets.all(20.0),
+      child: NeumorphicFilterBar(
+        icon: Icons.search,
+        navigateTo: FilterProperty(),
+      ),
+    ),
+          ),
+          ),
+          body: _futureData == null
               ? const Center(child: CircularProgressIndicator())
-              : Column(
-            children: [
-              Container(
-                height: 80,
-                width: double.infinity,
-                color: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    const CustomBackButton(),
-                    const SizedBox(width: 35),
-                    Image.asset(AppImages.appbar, height: 100),
-                  ],
-                ),
-              ),
-               Container(
-                    margin: EdgeInsets.all(20.0),
-                    child:
-                    // InkWell(
-                    //     onTap: (){
-                    //       Navigator.push(context, MaterialPageRoute(builder: (context)
-                    //       => Search(),
-                    //       ));
-                    //     },
-                    //     child:
-                    NeumorphicFilterBar(icon: Icons.search, navigateTo: FilterProperty())
-               ),
-              //
-              // Padding(
-              //   padding: const EdgeInsets.all(16),
-              //   child: TextField(
-              //     controller: searchController,
-              //     onChanged: _filterResults,
-              //     decoration: InputDecoration(
-              //       hintText: "Search by location or BHK...",
-              //       prefixIcon: const Icon(Icons.search),
-              //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              //       filled: true,
-              //       fillColor: AppColors.bgColor(context),
-              //     ),
-              //   ),
-              // ),
-              SizedBox(
-                height: 85,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(propertyTypes.length, (index) {
-                      final type = propertyTypes[index];
-                      final isSelected = type['selected'];
+              : FutureBuilder<List<AllModel>>(
+            future: _futureData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('${snapshot.error}'));
+              } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "No Data Found!",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  ),
+                );
+              }
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: InkWell(
-                          onTap: () => handleTap(index),
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            width: 100,
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.blue.shade50 : AppColors.bgColor(context),
+              final data = snapshot.data!;
+
+              return ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 100,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        children: List.generate(propertyTypes.length, (index) {
+                          final type = propertyTypes[index];
+                          final isSelected = type['selected'];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: InkWell(
+                              onTap: () => handleTap(index),
                               borderRadius: BorderRadius.circular(12),
-                              boxShadow: isSelected
-                                  ? [
-                                BoxShadow(
-                                  color: Colors.blue.withOpacity(0.3),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 4),
+                              child: Container(
+                                width: 100,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: isSelected ? Colors.blue.shade50 : AppColors.bgColor(context),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: isSelected
+                                      ? [BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 10, offset: Offset(0, 4))]
+                                      : [],
+                                  border: Border.all(color: isSelected ? Colors.blue : Colors.grey.shade500),
                                 ),
-                              ]
-                                  : [],
-                              border: Border.all(
-                                color: isSelected ? Colors.blue : Colors.grey.shade500,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      type['icon'],
+                                      color: isSelected ? Colors.blue : AppColors.textColor(context),
+                                      size: 30,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      type['label'],
+                                      style: TextStyle(
+                                        color: isSelected ? Colors.blue : AppColors.textColor(context),
+                                        fontFamily: 'Poppins',
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  type['icon'],
-                                  color: isSelected ? Colors.blue : AppColors.textColor(context),
-                                  size: 30,
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  type['label'],
-                                  style: TextStyle(
-                                    color: isSelected ? Colors.blue : AppColors.textColor(context),
-                                    fontFamily: 'Poppins',
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
+                          );
+                        }),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.all(15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        "Featured Property",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Poppins',
+
+                  // Title
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Featured Property",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, fontFamily: 'Poppins'),
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Text(
-                      "See all",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'Poppins',
-                        color: Theme.of(context).textTheme.bodyMedium!.color,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: FutureBuilder<List<AllModel>>(
-                  future: _futureData,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('${snapshot.error}'));
-                    } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-                      return const Center(
-                        child: Text(
-                          "No Data Found!",
+                        Text(
+                          "See all",
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
                             fontFamily: 'Poppins',
+                            color: Theme.of(context).textTheme.bodyMedium!.color,
                           ),
                         ),
-                      );
-                    }
+                      ],
+                    ),
+                  ),
 
-                    final data = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: data.length,
-                      padding: const EdgeInsets.all(10),
-                      itemBuilder: (context, index) {
-                        final item = data[index];
-                        return propertyCard(item);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+                  // Property List
+                  ...data.map((item) => propertyCard(item)).toList(),
+                ],
+              );
+            },
           ),
+
         ));
   }
 
@@ -320,7 +257,7 @@ class _AllPropertyState extends State<AllProperty> {
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('id_Building', item.id as int);
+        prefs.setInt('id_Building', int.parse(item.id));
         prefs.setString('id_Longitude', item.Longitude);
         prefs.setString('id_Latitude', item.Latitude);
         Navigator.push(context, MaterialPageRoute(builder: (context)

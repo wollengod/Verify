@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:verify/Screens/Real%20Estate/Home.dart';
-import 'package:verify/Screens/Real%20Estate/Sub_Srceen/Search.dart';
+import 'package:verify/Screens/Real%20Estate/filter.dart';
 import 'package:verify/Screens/profile.dart';
-import '../../Themes/mode button.dart';
-import '../../custom_widget/Paths.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -18,7 +16,7 @@ class _HomepageState extends State<Homepage> {
 
   final List<Widget> pages = const [
     Home(),
-    SearchPage(),
+    Profile(),
   ];
 
   void onTabTapped(int index) {
@@ -35,17 +33,17 @@ class _HomepageState extends State<Homepage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Image.asset(AppImages.appbar, height: 70),
-          leading: ThemeModeButton(),
+          title: Text('VERIFY',style: TextStyle(color: Colors.white,fontSize: 40,fontFamily: 'Poppins',fontWeight: FontWeight.w500),),
+          //Image.asset(AppImages.appbar, height: 70),
           centerTitle: true,
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.blue.shade900,
           actions: [
             const SizedBox(width: 40,),
             IconButton(onPressed: (){
               Navigator.push(context, MaterialPageRoute(builder: (context)
-                  => Profile()
+                  => FilterProperty()
               ));
-            }, icon: Icon(Icons.account_circle_rounded,color: Colors.white,size: 30,)),
+            }, icon: Icon(Icons.tune_sharp,color: Colors.white,size: 30,)),
             const SizedBox(width: 10,),
           ],
         ),
@@ -75,8 +73,8 @@ class _HomepageState extends State<Homepage> {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.shield),
-              label: 'Support',
+              icon: Icon(Icons.account_circle_rounded),
+              label: 'Profile',
             ),
           ],
           currentIndex: selectedIndex,

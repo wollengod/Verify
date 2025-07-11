@@ -1,3 +1,4 @@
+
 class FilterModel {
   final int id;
   final String Realstate_image;
@@ -85,7 +86,7 @@ class FilterModel {
     required this.CareTaker_number,
   });
 
-  factory FilterModel.FromJson(Map<String, dynamic> json) {
+  factory FilterModel.fromJson(Map<String, dynamic> json) {
     return FilterModel(
       id: int.tryParse(json['PVR_id'].toString()) ?? 0,
       Realstate_image: json['Realstate_image'] ?? '',
@@ -120,7 +121,7 @@ class FilterModel {
       balcony: json['balcony'] ?? '',
       kitchen: json['kitchen'] ?? '',
       Baathroom: json['Baathroom'] ?? '',
-      Wifi: json['Wifi'] ?? '',
+      Wifi: json['wifi'] ?? '',
       Waterfilter: json['Waterfilter'] ?? '',
       Gas_meter: json['Gas_meter'] ?? '',
       Water_geyser: json['Water_geyser'] ?? '',
@@ -130,4 +131,5 @@ class FilterModel {
       CareTaker_number: json['CareTaker_number'] ?? '',
     );
   }
+
 }

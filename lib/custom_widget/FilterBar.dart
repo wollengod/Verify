@@ -17,8 +17,8 @@ class NeumorphicFilterBar extends StatelessWidget {
     final boxColor = isDark ? const Color(0xFF13132C) : Colors.white;
     final borderGradient = LinearGradient(
       colors: isDark
-          ? [Color(0xFF00CFFF), Color(0xFF0055FF)]
-          : [Color(0xFF00A6FF), Color(0xFF007BFF)],
+          ? [const Color(0xFF00CFFF), const Color(0xFF0055FF)]
+          : [const Color(0xFF00A6FF), const Color(0xFF007BFF)],
     );
 
     return Center(
@@ -30,7 +30,7 @@ class NeumorphicFilterBar extends StatelessWidget {
         },
         child: Container(
           height: 55,
-          width: double.infinity,
+          width: 380, // Match width with search bar
           decoration: BoxDecoration(
             gradient: borderGradient,
             borderRadius: BorderRadius.circular(40),
@@ -55,17 +55,31 @@ class NeumorphicFilterBar extends StatelessWidget {
               ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(width: 30),
                 Icon(icon, size: 22, color: Colors.blue),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 const Text(
-                  "Filter",
+                  "Filter Properties",
                   style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
                     color: Colors.blue,
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.blueAccent : Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.tune, // Filter icon
+                    size: 20,
+                    color: Colors.white,
                   ),
                 ),
               ],

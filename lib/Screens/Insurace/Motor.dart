@@ -47,7 +47,7 @@ class Motor extends StatelessWidget {
             ),
           ),
           SizedBox(height: 30),
-          CircularProgressIndicator(color: Colors.white),
+          CircularProgressIndicator(color: AppColors.textColor(context)),
           SizedBox(height: 30),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -57,7 +57,7 @@ class Motor extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: Text("Back to Home"),
+            child: Text("Back to Home",style: TextStyle(color: Colors.white),),
           ),
 
         ],

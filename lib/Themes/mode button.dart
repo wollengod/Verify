@@ -10,18 +10,16 @@ class ThemeModeButton extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final currentMode = themeProvider.themeMode;
 
+    IconData modeIcon = switch (currentMode) {
+      ThemeMode.light => Icons.light_mode,
+      ThemeMode.dark => Icons.dark_mode,
+      _ => Icons.brightness_auto,
+    };
+
     return PopupMenuButton<ThemeMode>(
       icon: Icon(
-        currentMode == ThemeMode.light
-            ? Icons.light_mode
-            : currentMode == ThemeMode.dark
-            ? Icons.dark_mode
-            : Icons.brightness_auto, // system default
-        color: (currentMode == ThemeMode.light ||
-            (currentMode == ThemeMode.system &&
-                Theme.of(context).brightness == Brightness.light))
-            ? Colors.white // 🔥 force white on black AppBar
-            : Theme.of(context).iconTheme.color,
+        modeIcon,
+        color: Theme.of(context).iconTheme.color, // ✅ Automatically adapts
       ),
       onSelected: (ThemeMode mode) {
         switch (mode) {

@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../custom_widget/Paths.dart';
+
 import '../../../custom_widget/Preview.dart';
 import '../../../custom_widget/back_button.dart';
 import '../../../model/Home_model.dart';
@@ -57,224 +58,206 @@ class _Full_PropertyState extends State<Full_Property> {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).textTheme.bodyMedium!.color!;
-    final bgColor = Theme.of(context).scaffoldBackgroundColor;
-
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: CustomBackButton(),title: Text('VERIFY',style: TextStyle(color: Colors.white,fontSize: 40,fontFamily: 'Poppins',fontWeight: FontWeight.w500),),backgroundColor: Colors.blue.shade900,
+        centerTitle: true,
+      ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // AppBar
-            Container(
-              color: Colors.black,
-              height: 80,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  const CustomBackButton(),
-                  const SizedBox(width: 40),
-                  Image.asset(AppImages.appbar, height: 60),
-                ],
-              ),
-            ),
+        child: FutureBuilder<List<Catid>>(
+          future: _propertyFuture,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-            // Main content
-            Expanded(
-              child: FutureBuilder<List<Catid>>(
-                future: _propertyFuture,
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final data = snapshot.data!.first;
+            final data = snapshot.data!.first;
 
-                  return ListView(
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
-                      // Combined Image Section
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // MAIN IMAGE from `Building_image`
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              'https://verifyserve.social/${data.Building_image}',
-                              height: 220,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Center(child: Icon(Icons.broken_image)),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-                      // Title & Location
-                      Expanded(
-                        child: Text(
-                          data.tyope,
-                          style: TextStyle(
-                            fontSize: 25 ,
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                          ),
-                          overflow: TextOverflow.visible,
-                          softWrap: true,
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on, size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            data.Building_Location,
-                            style: TextStyle(color: textColor),
-                          ),
-                          const Spacer(),
-                          const Icon(Icons.directions_walk, size: 16),
-                          const SizedBox(width: 4),
-                          const Text("780m (12 min)"),
-                        ],
-                      ),
-
-                      const Divider(height: 32),
-
-                      // Description
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Description", style: Theme.of(context).textTheme.titleMedium),
-                          Row(
-                            children: const [
-                              Icon(Icons.star, color: Colors.amber, size: 18),
-                              SizedBox(width: 4),
-                              Text("4.8 (112)", style: TextStyle(fontSize: 14)),
-                            ],
-                          )
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        data.Building_information,
-                        style: TextStyle(color: textColor),
-                      ),
-
-                      const Divider(height: 32),
-
-                      // Amenities Grid
-                      Text("Amenities", style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        spacing: 20,
-                        runSpacing: 12,
-                        children: [
-                          //amenity(Icons.pool, 'Swimming'),
-                          amenity(Icons.bathtub, '${data.Baathroom} Bathroom'),
-                          amenity(Icons.bed, '${data.BHK}'),
-                          amenity(Icons.square_foot, '${data.sqft} sqft'),
-                          //amenity(Icons.wifi, 'Free WiFi'),
-                         // amenity(Icons.local_parking, 'Parking'),
-                          amenity(Icons.kitchen, '${data.kitchen} Kitchen'),
-                          amenity(Icons.star, '${data.Furnished}'),
-                        ],
-                      ),
-
-                      const Divider(height: 30),
-                      const SizedBox(height: 20,),
-                      Text('Property Images',style: TextStyle(color: textColor,fontSize: 28),),
-                      const SizedBox(height: 20,),
-                      // CAROUSEL of ADDITIONAL IMAGES
                       FutureBuilder<List<RealEstateSlider>>(
                         future: _sliderFuture,
-                        builder: (context, imgSnapshot) {
-                          if (!imgSnapshot.hasData) {
-                            return const SizedBox.shrink();
-                          }
-
-                          return SizedBox(
-                            height: 120,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: imgSnapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                final img = imgSnapshot.data![index].rimg!;
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: GestureDetector(
-                                onTap: () {
-                                Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                builder: (_) => ImagePreviewScreen(
-                                imageUrls: imgSnapshot.data!.map((e) => e.rimg!).toList(),
-                                initialIndex: index,),),);
-                                },
-                                child: Image.network(
-                                      'https://verifyserve.social/$img',
-                                      width: 160,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Container(
-                                        width: 160,
-                                        color: Colors.grey.shade200,
-                                        child: const Icon(Icons.image_not_supported),
-                                      ),
-                                    ),
-                                  ),
-                                ));
-                              },
-                            ),
-                          );
+                        builder: (context, sliderSnap) {
+                          return buildImageSection(data, sliderSnap.data ?? []);
                         },
                       ),
-                      const SizedBox(height: 30,),
-                      // Price + Book Now
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "₹ ${data.Rent + data.Verify_price}",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: textColor,
-                              foregroundColor: bgColor,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            child: const Text("Book Now"),
-                          )
-                        ],
-                      )
+                      const SizedBox(height: 16),
+                      buildTitleAndLocation(data),
+                      const SizedBox(height: 16),
+                      buildFeatureChips(data),
+                      const SizedBox(height: 16),
+                      buildStatsRow(data),
+                      const SizedBox(height: 16),
+                      Divider(color: Colors.grey,),
+                      Text(
+                        data.Building_information,
+                        style: GoogleFonts.poppins(color: Colors.grey,fontSize: 20),
+                      ),
+                      Divider(color: Colors.grey,),
+
+                      const SizedBox(height: 30),
+                      buildBottomBar(data),
                     ],
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget amenity(IconData icon, String label) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+
+  Widget buildImageSection(Catid data, List<RealEstateSlider> sliders) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Theme.of(context).iconTheme.color),
-        const SizedBox(width: 8),
-        Text(label, style: TextStyle(color: Theme.of(context).textTheme.bodyMedium!.color)),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            'https://verifyserve.social/${data.Building_image}',
+            height: 220,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 70,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: sliders.length,
+            itemBuilder: (context, index) {
+              final img = sliders[index].rimg!;
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ImagePreviewScreen(
+                        imageUrls:
+                        sliders.map((e) => e.rimg!).toList(),
+                        initialIndex: index,
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.blue.shade900),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      'https://verifyserve.social/$img',
+                      width: 80,
+                      height: 70,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget buildTitleAndLocation(Catid data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.flag, color: Colors.red, size: 16),
+            const SizedBox(width: 6),
+            Text(data.Building_Location,
+                style: GoogleFonts.poppins(
+                    fontSize: 14, color: Colors.grey)),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(data.tyope,
+            style: GoogleFonts.poppins(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: Colors.black)),
+      ],
+    );
+  }
+
+  Widget buildFeatureChips(Catid data) {
+    return Wrap(
+      spacing: 10,
+      children: [
+        chip(Icons.check_circle, data.Furnished),
+        chip(Icons.local_parking, 'Parking'),
+        chip(Icons.pool, 'Pool'),
+      ],
+    );
+  }
+
+  Widget chip(IconData icon, String label) {
+    return Chip(
+      avatar: Icon(icon, size: 18, color: Colors.black54),
+      label: Text(label, style: GoogleFonts.poppins(color: Colors.black)),
+      backgroundColor: Colors.grey.shade300,
+      shape: StadiumBorder(side: BorderSide(color: Colors.black54)),
+    );
+  }
+
+  Widget buildStatsRow(Catid data) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        statTile(Icons.bed, '${data.BHK}', 'Bed'),
+        statTile(Icons.bathtub, '${data.Baathroom}', 'Bath'),
+        statTile(Icons.house, '${data.tyope}', 'Floor'),
+        statTile(Icons.square_foot, '${data.sqft}', 'Sqft'),
+      ],
+    );
+  }
+
+  Widget statTile(IconData icon, String value, String label) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.black),
+        const SizedBox(height: 4),
+        Text(value,
+            style: GoogleFonts.poppins(
+                color: Colors.black, fontWeight: FontWeight.bold)),
+        Text(label,
+            style: GoogleFonts.poppins(
+                fontSize: 12, color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget buildBottomBar(Catid data) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text('₹ ${data.Rent + data.Verify_price}',
+            style: GoogleFonts.poppins(
+                fontSize: 20, color: Colors.blue.shade900, fontWeight: FontWeight.bold)),
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue.shade900,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          child: Text("Book Schedule", style: GoogleFonts.poppins()),
+        )
       ],
     );
   }

@@ -10,8 +10,8 @@ class CustomBackButton extends StatelessWidget {
   const CustomBackButton({
     super.key,
     this.onPressed,
-    this.iconColor = Colors.white,
-    this.backgroundColor = Colors.black,
+    this.iconColor = Colors.black,
+    this.backgroundColor = Colors.white,
     this.height = 30,
     this.width = 30,
   });
@@ -26,13 +26,13 @@ class CustomBackButton extends StatelessWidget {
         width: width,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
           child: const Icon(
             Icons.arrow_back_ios_new_rounded,
             size: 20,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
       ),
