@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
+import 'package:verify/utilities/hex_color.dart';
 import '../../Themes/theme-helper.dart';
 import '../../custom_widget/Paths.dart';
 import '../../custom_widget/back_button.dart';
@@ -38,13 +39,13 @@ class _ServicePageState extends State<ServicePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+     backgroundColor:  "#EEF5FF".toColor(),
       appBar: AppBar(
-        leading: CustomBackButton(),
-        title: Text('VERIFY',style: TextStyle(color: Colors.white,fontSize: 40,fontFamily: 'Poppins',fontWeight: FontWeight.w500),),
-        //Image.asset(AppImages.appbar, height: 70),
+        title:
+        Image.asset(AppImages.logo2, height: 70),
         centerTitle: true,
-        backgroundColor: Colors.blue.shade900,
+        backgroundColor: "#001234".toColor(),
+        leading: CustomBackButton(),
       ),
       body: Column(
         children: [
@@ -130,7 +131,7 @@ class _ServicePageState extends State<ServicePage> {
       borderRadius: BorderRadius.circular(16),
       child:Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(

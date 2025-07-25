@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:verify/utilities/hex_color.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:verify/custom_widget/back_button.dart';
-import '../../Themes/theme-helper.dart';
+import '../../custom_widget/Paths.dart';
 import '../../model/All_model.dart';
 import '../../model/filter_model.dart';
 import 'Sub_Srceen/full property.dart';
@@ -37,12 +38,17 @@ class _FilterPropertyState extends State<FilterProperty> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton.icon(
-          onPressed: filterProperties,
+          onPressed: (){
+            Navigator.pop(context);
+            Future.delayed(const Duration(milliseconds: 100), () {
+              filterProperties();
+            });
+          },
           icon: const Icon(Icons.filter_alt_rounded),
           label: const Text("Apply the filter"),
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            backgroundColor: Colors.blueAccent,
+            backgroundColor: "#001234".toColor(),
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             elevation: 3,
@@ -122,7 +128,9 @@ class _FilterPropertyState extends State<FilterProperty> {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
-      data.sort((a, b) => b['PVR_id'].compareTo(a['PVR_id']));
+      //data.sort((a, b) => a['PVR_id'].compareTo(b['PVR_id'])); // ascending
+      data.sort((a, b) => b['PVR_id'].compareTo(a['PVR_id'])); //descending
+
       return data.map((item) => AllModel.FromJson(item)).toList();
     } else {
       throw Exception('Failed to load data');
@@ -160,7 +168,7 @@ class _FilterPropertyState extends State<FilterProperty> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: "#EEF5FF".toColor(),
         body: _futureData == null
             ? const Center(child: CircularProgressIndicator())
             : Column(
@@ -168,7 +176,7 @@ class _FilterPropertyState extends State<FilterProperty> {
             _buildAppBar(),
             Container(
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: "#EEF5FF".toColor(),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
@@ -196,8 +204,8 @@ class _FilterPropertyState extends State<FilterProperty> {
                           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                         ),
                         builder: (_) => Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration:  BoxDecoration(
+                            color: "#EEF5FF".toColor(),
                             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                           ),
                           padding: EdgeInsets.only(
@@ -213,7 +221,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                       icon: const Icon(Icons.tune),
                       label: const Text("Filter"),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
+                        backgroundColor: "#001234".toColor(),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -278,7 +286,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                     padding: const EdgeInsets.all(10),
                     itemBuilder: (context, index) {
                       final item = data[index];
-                      return propertyCard(item);
+                      return recommendedPropertyCard(item); // ⬅ replaced old card
                     },
                   );
                 },
@@ -292,30 +300,18 @@ class _FilterPropertyState extends State<FilterProperty> {
 
   Widget _buildAppBar() {
     return Container(
-      height: 70,
+      height: 65,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 6)],
+      decoration: BoxDecoration(
+        color: "#001234".toColor(),
+
+        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6)],
       ),
       child: Row(
         children: [
           const CustomBackButton(),
           const Spacer(),
-          const Text(
-            'VERIFY',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 26,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
+          Image.asset(AppImages.logo2, height: 70),
           const Spacer(flex: 2),
         ],
       ),
@@ -372,10 +368,9 @@ class _FilterPropertyState extends State<FilterProperty> {
             children: [
               buildFilterButtons(),
               if (filteredData.isNotEmpty || noResult) ...[
-                const SizedBox(width: 10),
                 TextButton.icon(
                   onPressed: clearFilters,
-                  icon: const Icon(Icons.clear, size: 18),
+                  icon: const Icon(Icons.clear, size: 14),
                   label: const Text("Clear"),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.red,
@@ -408,8 +403,8 @@ class _FilterPropertyState extends State<FilterProperty> {
           children: [
             Text(
               "Min : ₹ ${_minBudget.toStringAsFixed(1)} ${_minBudget < 1 ? "L" : "Cr"}",
-              style: const TextStyle(
-                color: Colors.blue,
+              style:  TextStyle(
+                color: "#001234".toColor(),
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
                 fontFamily: 'Poppins',
@@ -417,8 +412,8 @@ class _FilterPropertyState extends State<FilterProperty> {
             ),
             Text(
               "Max : ₹ ${_maxBudget.toStringAsFixed(1)} ${_maxBudget < 1 ? "L" : "Cr"}${_maxBudget >= 5 ? "+" : ""}",
-              style: const TextStyle(
-                color: Colors.blue,
+              style:  TextStyle(
+                color: "#001234".toColor(),
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
                 fontFamily: 'Poppins',
@@ -432,8 +427,8 @@ class _FilterPropertyState extends State<FilterProperty> {
           min: 0,
           max: 500, // up to 5 Cr in Lakh
           divisions: 100, // smoother thumb control
-          activeColor: Colors.blue,
-          inactiveColor: Colors.blue.shade100,
+          activeColor: "#001234".toColor(),
+          inactiveColor: Colors.grey.shade500,
           labels: RangeLabels(
             _formatPrice(_minBudget),
             _formatPrice(_maxBudget),
@@ -558,149 +553,268 @@ class _FilterPropertyState extends State<FilterProperty> {
     }
   }
 
-  Widget propertyCard(AllModel item) {
+  Widget recommendedPropertyCard(AllModel item) {
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setInt('id_Building', int.parse(item.id));
         prefs.setString('id_Longitude', item.Longitude);
         prefs.setString('id_Latitude', item.Latitude);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Full_Property()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const Full_Property()));
       },
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(5, 5, 5, 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(1),
-              blurRadius: 12,
-              offset: Offset(0, 6),
-            ),
-          ],
-        ),
-
+      child: Card(
+        margin: const EdgeInsets.fromLTRB(15, 5, 15, 20),
+        color: "#F5F8FF".toColor(),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 5,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: Image.network(
-                "https://verifyserve.social/${item.Building_image}",
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Card(
+              elevation: 4,
+              margin: const EdgeInsets.all(10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Stack(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(item.buy_Rent, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600,color: Colors.black)),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      "https://verifyserve.social/${item.Building_image}",
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        height: 160,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.image_not_supported, size: 40),
                       ),
-                      Text("₹${item.Verify_price}", style:  TextStyle(fontWeight: FontWeight.bold,color: Colors.blue)),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on, size: 16,color: Colors.grey,),
-                      const SizedBox(width: 4),
-                      Expanded(child: Text(item.Building_Location, overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.black),)),
-                    ],
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: _badge(item.buy_Rent, Colors.blue.shade800),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      featureIcon(Icons.bed, "${item.BHK}"),
-                      featureIcon(Icons.bathtub_outlined, "${item.Baathroom} Baths"),
-                      featureIcon(Icons.square_foot, "1000 Sqft"),
-                    ],
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: _badge(item.tyope, Colors.black.withOpacity(0.7)),
                   ),
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _nestedSpecCard(Icons.bed, "${item.BHK}"),
+                  _nestedSpecCard(Icons.bathtub, "${item.Baathroom} Bath"),
+                  _nestedSpecCard(Icons.square_foot, "1000 Ft"),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              child: Card(
+                elevation: 4,
+                color: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "₹ ${item.Verify_price}",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                      const SizedBox(width: 30),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.Building_Location,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                          Text(
+                            "New Delhi 110030",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
           ],
         ),
       ),
     );
   }
 
+
   Widget propertyCard2(FilterModel item) {
+    final rawPrice = item.Property_Number;
+
+
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setInt('id_Building', item.id);
         prefs.setString('id_Longitude', item.Longtitude);
         prefs.setString('id_Latitude', item.Latitude);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Full_Property()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const Full_Property()));
       },
-      child: Container(
+      child: Card(
         margin: const EdgeInsets.fromLTRB(15, 5, 15, 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(1),
-              blurRadius: 12,
-              offset: Offset(0, 6),
-            ),
-          ],
-        ),
-
-
+        color: "#F5F8FF".toColor(),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 5,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-              child: Image.network(
-                "https://verifyserve.social/${item.Realstate_image}",
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
+            Card(
+              elevation: 4,
+              margin: const EdgeInsets.all(10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      "https://verifyserve.social/${item.Realstate_image}",
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        height: 160,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.image_not_supported, size: 40),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: _badge(item.Buy_Rent, Colors.blue.shade800),
+                  ),
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: _badge(item.Typeofproperty, Colors.black.withOpacity(0.7)),
+                  ),
+                ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("${item.Buy_Rent}", style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
-                      Text("${item.Typeofproperty}", style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.black)),
-                      Text(" ₹${item.Property_Number} ", style:  TextStyle(fontWeight: FontWeight.bold,color: Colors.blue.shade900,fontSize: 18)),
-
-                    ],
-                  ),
-                  Text(item.Place_, style: TextStyle(color: AppColors.textColor(context))),
-                  Row(
-                    children: [
-                      const Icon(Icons.bed, size: 16,color: Colors.grey,),
-                      const SizedBox(width: 4),
-                      Text("${item.Bhk_Squarefit}",style: TextStyle(color: Colors.black),),
-                      const SizedBox(width: 80),
-                      featureIcon(Icons.bathtub_outlined, "${item.Baathroom} Baths",),
-                      const SizedBox(width: 40),
-                    ],
-                  )
+                  _nestedSpecCard(Icons.bed, "${item.Bhk_Squarefit}"),
+                  _nestedSpecCard(Icons.bathtub, "${item.Baathroom} Bath"),
+                  _nestedSpecCard(Icons.square_foot, "900 Ft"),
                 ],
               ),
-            )
+            ),
+            const SizedBox(height: 8),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              child: Card(
+                elevation: 4,
+                color: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "₹ ${rawPrice}",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+
+                      const SizedBox(width: 30),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.Place_,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                          Text(
+                            "New Delhi 110030",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
           ],
         ),
       ),
     );
   }
+  Widget _nestedSpecCard(IconData icon, String label) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: Colors.black87),
+            const SizedBox(width: 6),
+            Text(label, style: const TextStyle(fontSize: 13, color: Colors.black, fontFamily: 'Poppins')),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _badge(String label, Color bgColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(20)),
+      child: Text(label, style: const TextStyle(fontSize: 11, color: Colors.white)),
+    );
+  }
+
 
   Widget featureIcon(IconData icon, String label) {
     return Row(

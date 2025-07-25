@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:verify/Themes/theme-helper.dart';
 import 'package:verify/custom_widget/Paths.dart';
+import 'package:verify/utilities/hex_color.dart';
 import 'Real Estate/Homepage.dart';
 import 'Reset_password/forget.dart';
 import 'SignUp.dart';
@@ -53,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
       await shared_pref.setInt('id', IDFromAPI);
 
       //profile(fullNameFromAPI,emailFromAPI,IDFromAPI);
-      Navigator.push(context, MaterialPageRoute(builder: (context)
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)
       => Homepage(),
       ));
 
@@ -69,16 +71,17 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return  SafeArea(
       child: Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body:SingleChildScrollView(
+        backgroundColor: "#001234".toColor(),
+        body:SingleChildScrollView(
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   width: double.infinity,
-                  color: Colors.black,
+                  color: "#001234".toColor(),
+
                   child: Image.asset(
-                    AppImages.appbar,
+                    AppImages.logo2,
                     height: 100,
                   ),
                 ),
@@ -95,7 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Poppins',
-                            color: Theme.of(context).textTheme.bodyMedium!.color,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -104,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Poppins',
-                            color: Theme.of(context).textTheme.bodyMedium!.color,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 40),
@@ -145,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                             child:  Text(
                               "Forgot Password?",
                               style: TextStyle(
-                                color: Theme.of(context).textTheme.bodyMedium!.color,
+                                color: Colors.white,
                                 fontSize: 14,
                                 fontStyle: FontStyle.italic,
                               ),
@@ -168,14 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                             height: 55,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
-                                gradient: LinearGradient(
-                                    colors: [
-                                    ?Theme.of(context).textTheme.bodyMedium!.color,
-                                ?Theme.of(context).textTheme.bodyMedium!.color,
-                            ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          ),
+                            color: AppColors.textColor(context),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black12,
@@ -190,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                                   :  Text(
                                 "Login",
                                 style: TextStyle(
-                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  color: AppColors.bgColor(context),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 18,
                                 ),
@@ -203,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Don’t have an account? "),
+                            const Text("Don’t have an account? ",style: TextStyle(color: Colors.white),),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(context, MaterialPageRoute(builder: (_) => SignUpPage()));
@@ -211,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                               child: Text(
                                 "Sign Up",
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodyMedium!.color,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   decoration: TextDecoration.underline,
                                 ),

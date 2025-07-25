@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:verify/custom_widget/Paths.dart';
+import 'package:verify/utilities/hex_color.dart';
 import 'Real Estate/Homepage.dart';
 import 'Loginpage.dart';
 
@@ -22,9 +23,9 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Or your branding color
-      body: Center(
-        child: Image(image: AssetImage(AppImages.appbar)),
+        backgroundColor: "#001234".toColor(),
+        body: Center(
+        child: Image(image: AssetImage(AppImages.logo2)),
     )
     );
   }
@@ -37,7 +38,7 @@ class SplashScreenState extends State<SplashScreen> {
 
     //Provider.of<UserModel>(context, listen: false).updateUserData(name, email, userID);
 
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
     Navigator.pushReplacement(

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:verify/model/Office_model.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:verify/model/search_model.dart';
 import 'package:verify/utilities/hex_color.dart';
-import '../Screens/Real Estate/Sub_Srceen/full property.dart';
+import '../../Screens/Real Estate/Sub_Srceen/full property.dart';
 
-class PropertyCard extends StatelessWidget {
-  final OfficePropertyModel item;
+class SearchPropertyCard extends StatelessWidget {
+  final SearchModel item;
 
-  const PropertyCard({super.key, required this.item});
+  const SearchPropertyCard({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
     String displayPrice = item.propertyNumber.trim();
-
     String? numericOnly = displayPrice.replaceAll(RegExp(r'[^\d]'), '');
     bool isPureNumber = RegExp(r'^\d+$').hasMatch(displayPrice);
 
@@ -30,8 +29,7 @@ class PropertyCard extends StatelessWidget {
         prefs.setString('id_Latitude', item.latitude);
         Navigator.push(context, MaterialPageRoute(builder: (_) => const Full_Property()));
       },
-      child:
-      Card(
+      child: Card(
         color: "#F5F8FF".toColor(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,12 +41,7 @@ class PropertyCard extends StatelessWidget {
                 child: Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10),
-                      ),
+                      borderRadius: BorderRadius.circular(10),
                       child: Image.network(
                         "https://verifyserve.social/${item.realstateImage}",
                         height: 160,
@@ -72,15 +65,14 @@ class PropertyCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
                 children: [
-                  Expanded(child: _nestedSpecCard(Icons.bed, "${item.bhkSquarefit}")),
+                  Expanded(child: _nestedSpecCard(Icons.meeting_room, "${item.floor}")),
                   const SizedBox(width: 6),
                   Expanded(child: _nestedSpecCard(Icons.bathtub, item.bathroom)),
                   const SizedBox(width: 6),
-                  Expanded(child: _nestedSpecCard(Icons.square_foot, "2000 Ft")),
+                  Expanded(child: _nestedSpecCard(Icons.square_foot, "900")),
                 ],
               ),
             ),
-
             const SizedBox(height: 5),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -135,7 +127,6 @@ class PropertyCard extends StatelessWidget {
                       ),
                     ],
                   ),
-
                 ),
               ),
             ),
@@ -168,7 +159,6 @@ class PropertyCard extends StatelessWidget {
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                softWrap: false,
               ),
             ),
           ],
@@ -176,8 +166,6 @@ class PropertyCard extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _badge(String label, Color bgColor) {
     return Container(

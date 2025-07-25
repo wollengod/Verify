@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:verify/utilities/hex_color.dart';
+
+import '../Screens/Real Estate/search_result.dart';
 
 class NeumorphicSearchBar extends StatefulWidget {
   final String HintText;
+
   const NeumorphicSearchBar({
     super.key,
     required this.HintText,
@@ -62,6 +66,7 @@ class _NeumorphicSearchBarState extends State<NeumorphicSearchBar>
       if (available) {
         setState(() => _isListening = true);
         _animationController.repeat(reverse: true);
+
         _speech.listen(
           onResult: (val) {
             setState(() {
@@ -71,6 +76,16 @@ class _NeumorphicSearchBarState extends State<NeumorphicSearchBar>
                 TextPosition(offset: _controller.text.length),
               );
             });
+
+            if (val.finalResult && _searchText.trim().isNotEmpty) {
+              setState(() {
+                _isListening = false;
+              });
+              _speech.stop();
+              _animationController.stop();
+              _animationController.value = 1.0;
+              _navigateToResult(_searchText.trim());
+            }
           },
         );
       }
@@ -82,38 +97,45 @@ class _NeumorphicSearchBarState extends State<NeumorphicSearchBar>
     }
   }
 
+  void _navigateToResult(String keyword) {
+    if (keyword.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchResultPage(keyword: keyword),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Color darkBoxColor = const Color(0xFF13132C);
-
+    final Color darkBoxColor = "#001234".toColor();
     final LinearGradient neonGradient = const LinearGradient(
-      colors: [
-        Color(0xFF00F0FF),
-        Color(0xFF002AFF),
-      ],
+      colors: [Color(0xFF00F0FF), Color(0xFF002AFF)],
     );
 
     return Center(
       child: Container(
+
         height: 55,
         width: 350,
         decoration: BoxDecoration(
           gradient: neonGradient,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFF00F0FF).withOpacity(0.4),
-              blurRadius: 12,
-              spreadRadius: 1,
-              offset: const Offset(0, 0),
+              blurRadius: 6,
+              spreadRadius: 0,
             ),
           ],
         ),
-        padding: const EdgeInsets.all(3.5),
+        padding: const EdgeInsets.all(2),
         child: Container(
           decoration: BoxDecoration(
             color: darkBoxColor,
-            borderRadius: BorderRadius.circular(40),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
             children: [
@@ -127,20 +149,23 @@ class _NeumorphicSearchBarState extends State<NeumorphicSearchBar>
                     hintText: widget.HintText,
                     hintStyle: const TextStyle(color: Colors.grey),
                     border: InputBorder.none,
+                    suffixIcon: _controller.text.isNotEmpty
+                        ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.white70),
+                      onPressed: () {
+                        setState(() {
+                          _controller.clear();
+                          _searchText = '';
+                        });
+                      },
+                    )
+                        : null,
                   ),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(right: 6),
-                padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.search_sharp,
-                  size: 20,
-                  color: Colors.white,
+                  onSubmitted: (value) {
+                    if (value.trim().isNotEmpty) {
+                      _navigateToResult(value.trim());
+                    }
+                  },
                 ),
               ),
               GestureDetector(
@@ -164,7 +189,7 @@ class _NeumorphicSearchBarState extends State<NeumorphicSearchBar>
                           : [],
                     ),
                     child: Icon(
-                      _isListening ? Icons.mic : Icons.mic_none,
+                      _isListening ? Icons.mic_off : Icons.mic_none,
                       size: 20,
                       color: Colors.white,
                     ),

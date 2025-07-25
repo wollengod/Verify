@@ -15,8 +15,8 @@ class Catid {
   final String maintence;
   final String buy_Rent;
   final String Building_information;
-  final String Parking;
   final String balcony;
+  final String Parking;
   final String facility;
   final String Furnished;
   final String kitchen;
@@ -53,7 +53,7 @@ class Catid {
 
   factory Catid.FromJson(Map<String, dynamic> json) {
     return Catid(
-      id: json['PVR_id'] ?? 0,
+      id: int.tryParse(json['PVR_id'].toString()) ?? 0,
       Building_Name: json['Building_information'] ?? '',
       Building_Address: json['Address_'] ?? '',
       Building_Location: json['Place_'] ?? '',

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:verify/utilities/hex_color.dart';
 import '../../Themes/theme-helper.dart';
+import '../../custom_widget/Paths.dart';
 import '../../custom_widget/back_button.dart';
 
 class ServiceBookingPage extends StatefulWidget {
@@ -93,7 +95,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
     final userNumber = prefs.getString('number') ?? '';
     final email = prefs.getString('email') ?? '';
 
-    final Uri url = Uri.parse('https://verifyserve.social/PHP_Files/add_demand_website/insert.php');
+    final Uri url = Uri.parse('https://verifyserve.social/Second%20PHP%20FILE/service_api/service_api.php');
     final request = http.MultipartRequest('POST', url);
 
     request.fields.addAll({
@@ -106,19 +108,20 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
       'suitable_day': selectedDate!,
       'suitable_time': selectedTime!,
       'address_for_services': locationController.text.trim(),
-    });
+    }
+    );
 
     setState(() => isLoading = true);
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-
+      print("➡️ BODY: $response");  // debug
       if (response.statusCode == 200 && response.body.contains("success")) {
         showSnack("✅ Service booked successfully!");
         Navigator.pop(context);
       } else {
-        showSnack("❌ Booking failed", error: true);
+        showSnack("❌ Booking failed", error: true,);
       }
     } catch (e) {
       showSnack("⚠️ Error: $e", error: true);
@@ -134,21 +137,13 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
     // final cardColor = Theme.of(context).cardColor;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        leading: CustomBackButton(),
-        title: Text(
-          'VERIFY',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 32,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title:
+        Image.asset(AppImages.logo2, height: 70),
         centerTitle: true,
-        backgroundColor: Colors.blue.shade900,
-        elevation: 0,
+        backgroundColor: "#001234".toColor(),
+        leading: CustomBackButton(),
       ),
       body: Stack(
         children: [
@@ -336,7 +331,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: "#EEF5FF".toColor(),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(

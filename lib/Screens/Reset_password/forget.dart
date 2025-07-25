@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:verify/utilities/hex_color.dart';
 import '../../custom_widget/Paths.dart';
 import '../../custom_widget/back_button.dart';
 import 'otp.dart';
@@ -57,18 +58,19 @@ class _ForgetState extends State<Forget> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(child: Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: "#001234".toColor(),
       body: Column(
         children: [
           // Header Image
           Container(
             width: double.infinity,
-            color: Colors.black,
+            color: "#001234".toColor(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                CustomBackButton(),
-                SizedBox(width: 20,),
-                Image.asset(AppImages.appbar, height: 100),
+                const CustomBackButton(),
+                const SizedBox(width: 16),
+                Image.asset(AppImages.logo2, height: 100),
               ],
             ),
           ),

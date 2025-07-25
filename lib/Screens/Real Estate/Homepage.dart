@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:verify/Screens/Real%20Estate/Home.dart';
 import 'package:verify/Screens/Real%20Estate/filter.dart';
 import 'package:verify/Screens/profile.dart';
+import 'package:verify/utilities/hex_color.dart';
+
+import '../../custom_widget/Paths.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -33,10 +36,11 @@ class _HomepageState extends State<Homepage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('VERIFY',style: TextStyle(color: Colors.white,fontSize: 40,fontFamily: 'Poppins',fontWeight: FontWeight.w500),),
-          //Image.asset(AppImages.appbar, height: 70),
+          title:
+          //Text('VERIFY',style: TextStyle(color: Colors.white,fontSize: 40,fontFamily: 'Poppins',fontWeight: FontWeight.w500),),
+          Image.asset(AppImages.logo2, height: 70),
           centerTitle: true,
-          backgroundColor: Colors.blue.shade900,
+          backgroundColor: "#001234".toColor(),
           actions: [
             const SizedBox(width: 40,),
             IconButton(onPressed: (){
@@ -80,9 +84,11 @@ class _HomepageState extends State<Homepage> {
           currentIndex: selectedIndex,
           onTap: onTabTapped,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.grey,
+          backgroundColor:
+          //Colors.black,
+          "#001234".toColor(),
           showSelectedLabels: true,
           showUnselectedLabels: true,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),

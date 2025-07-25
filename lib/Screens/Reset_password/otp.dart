@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
+import 'package:verify/utilities/hex_color.dart';
 
 import 'changing_pass.dart';
 class Otp extends StatefulWidget {
@@ -42,7 +43,7 @@ class _OtpState extends State<Otp> {
     final _formkey = GlobalKey<FormState>();
     return SafeArea(
         child: Scaffold(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            backgroundColor: "#001234".toColor(),
             body: SingleChildScrollView(
                 child: Container(
                   margin: EdgeInsets.all(20.0),
@@ -51,9 +52,9 @@ class _OtpState extends State<Otp> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 20,),
-                         Text('Verification Code',style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,color: Theme.of(context).textTheme.bodyMedium!.color,),),
+                         Text('Verification Code',style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,color: Colors.white),),
                         const SizedBox(height: 20,),
-                         Text('Enter the verification code that we send on mobile after confirmation you can reset your password',style: TextStyle(fontSize: 18,color: Theme.of(context).textTheme.bodyMedium!.color,),),
+                         Text('Enter the verification code that we send on mobile after confirmation you can reset your password',style: TextStyle(fontSize: 18,color: Colors.white),),
                         const SizedBox(height: 100,),
                         Form(
                           key: _formkey,
