@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:verify/utilities/hex_color.dart';
 import '../../../custom_widget/Paths.dart';
@@ -61,6 +62,52 @@ class _Full_PropertyState extends State<Full_Property> {
       throw Exception('Failed to load images');
     }
   }
+  final bookingDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+
+  Future<void> bookSchedule({
+    required String id,
+    required String location,
+    required String info,
+    required String furnished,
+    required String bhk,
+    required String type,
+    required String userId,
+    required String userName,
+    required String phoneNumber,
+    required String address, // user’s address or property address
+  }) async {
+    final url = Uri.parse(
+        'https://verifyserve.social/Second%20PHP%20FILE/book_shedual/book_shedual.php');
+
+    final body = {
+      'user_ids': userId,
+      'user_names': userName,
+      'property_id': id,
+      'locations': location,
+      'booking_date': bookingDate,
+      'descriptions': info,
+      'furnished': furnished,
+      'addresss': address,
+      'BHK': bhk,
+      'type_of_property': type,
+      'phone_number': phoneNumber,
+    };
+
+    final response = await http.post(url, body: body);
+
+    if (response.statusCode == 200 && response.body.contains('success')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Booking Successful')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking Failed: ${response.body}')),
+      );
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -72,13 +119,15 @@ class _Full_PropertyState extends State<Full_Property> {
         title: Image.asset(AppImages.logo2, height: 70),
         centerTitle: true,
         backgroundColor: "#001234".toColor(),
+        surfaceTintColor: "#001234".toColor(),
+
       ),
       body: SafeArea(
         child: FutureBuilder<List<Catid>>(
           future: _propertyFuture,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator(color: Colors.black,));
             }
 
             final data = snapshot.data!.first;
@@ -102,7 +151,7 @@ class _Full_PropertyState extends State<Full_Property> {
                       const SizedBox(height: 20),
                       buildDetailsGrid(data),
                       const SizedBox(height: 20),
-                      buildStaticInfoSection(),
+                      buildStaticInfoSection(data.floor_),
                       const SizedBox(height: 20),
                       Text("Description",
                           style: GoogleFonts.poppins(color: Colors.black,
@@ -144,9 +193,34 @@ class _Full_PropertyState extends State<Full_Property> {
                             color: "#001234".toColor(),
                             fontWeight: FontWeight.bold)),
                     ElevatedButton(
-                      onPressed: () {
-                        // Add your booking logic here
+                      onPressed: () async {
+                        final propertyList = await _propertyFuture;
+                        final sliderList = await _sliderFuture;
+
+                        if (propertyList.isEmpty) return;
+                        final property = propertyList.first;
+
+                        final prefs = await SharedPreferences.getInstance();
+                        final userId = prefs.getInt("id") ?? "0";
+                        final name = prefs.getString("name") ?? "0";
+                        final number = prefs.getString("number") ?? "0";
+
+
+                        await bookSchedule(
+                          userId: userId.toString(),
+                          userName: name,
+                          phoneNumber: number,
+                          address: data.Building_Address,
+                          id: data.id.toString(),
+                          location: data.Building_Location,
+                          info: data.Building_information,
+                          furnished: data.Furnished,
+                          bhk: data.BHK,
+                          type: data.tyope,
+                        );
+
                       },
+  
                       style: ElevatedButton.styleFrom(
                         backgroundColor: "#001234".toColor(),
                         shape: RoundedRectangleBorder(
@@ -248,7 +322,7 @@ class _Full_PropertyState extends State<Full_Property> {
     );
   }
 
-  Widget buildStaticInfoSection() {
+  Widget buildStaticInfoSection(String floor) {
     final List<Map<String, dynamic>> infoList = [
       {
         'icon': Icons.double_arrow_outlined,
@@ -268,7 +342,7 @@ class _Full_PropertyState extends State<Full_Property> {
       {
         'icon': Icons.store_mall_directory,
         'title': 'On Floor',
-        'value': '2nd',
+        'value': floor,
       },
       {
         'icon': Icons.lightbulb_outline,

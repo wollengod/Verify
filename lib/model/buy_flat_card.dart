@@ -65,11 +65,11 @@ class BuyFlatCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
                 children: [
-                  Expanded(child: _nestedSpecCard(Icons.bed, "${item.floor}")),
+                  Expanded(child: _nestedSpecCard(Icons.bed, "${item.bhkSquarefit}")),
                   const SizedBox(width: 6),
                   Expanded(child: _nestedSpecCard(Icons.bathtub, item.bathroom)),
                   const SizedBox(width: 6),
-                  Expanded(child: _nestedSpecCard(Icons.square_foot, "2000 Ft")),
+                  Expanded(child: _nestedSpecCard(Icons.square_foot, "900 Ft")),
                 ],
               ),
             ),
@@ -148,7 +148,7 @@ class BuyFlatCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 16, color: Colors.black87),
-            const SizedBox(width: 13),
+            const SizedBox(width: 10),
             Flexible(
               child: Text(
                 label,

@@ -1,13 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:verify/Screens/Loginpage.dart';
 import 'package:verify/custom_widget/Paths.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -23,62 +23,78 @@ class _ProfileState extends State<Profile> {
   int id = 0;
   File? _profileImage;
   final ImagePicker _picker = ImagePicker();
+  String? _profileImageUrl;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
-    _loadProfileImage();
   }
-
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
+      File imageFile = File(pickedFile.path);
+      await uploadProfileImageToServer(imageFile);
+    }
+  }
 
-      // Optional: save to SharedPreferences if needed
+  Future<void> uploadProfileImageToServer(File imageFile) async {
+    try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('profile_image_path', pickedFile.path);
+      String? userId = prefs.getInt('id')?.toString();
+
+      if (userId == null) {
+        print('User ID not found in SharedPreferences.');
+        return;
+      }
+
+      var uri = Uri.parse(
+          'https://verifyserve.social/Second%20PHP%20FILE/profie_image_update_main_realestate/profile_image_update.php');
+
+      var request = http.MultipartRequest('POST', uri);
+      request.fields['id'] = userId;
+      request.files
+          .add(await http.MultipartFile.fromPath('profile_image', imageFile.path));
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        final respStr = await response.stream.bytesToString();
+        final respJson = jsonDecode(respStr);
+
+        if (respJson['status'] == 'success') {
+          String imagePath = respJson['image_path'];
+          String fullUrl =
+              'https://verifyserve.social/Second%20PHP%20FILE/profie_image_update_main_realestate/$imagePath';
+
+          await prefs.setString('profile_image_url', fullUrl);
+
+          setState(() {
+            _profileImage = imageFile; // still shows instantly
+            _profileImageUrl = fullUrl; // persistent
+          });
+
+          print('Uploaded to: $fullUrl');
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(respJson['message'] ?? 'Upload successful')),
+          );
+        } else {
+          print('Upload failed: ${respJson['message']}');
+        }
+      } else {
+        print('Failed to upload. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error uploading image: $e');
     }
   }
 
 
-  Future<void> _loadProfileImage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final path = prefs.getString('profile_image_path');
-
-    if (path != null && File(path).existsSync()) {
-      setState(() {
-        _profileImage = File(path);
-      });
-    }
-  }
-  void uploadProfileImageToServer() async {
-    if (_profileImage == null) return;
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('https://your-api.com/upload'),
-    );
-
-    request.files.add(
-      await http.MultipartFile.fromPath('profile', _profileImage!.path),
-    );
-
-    var response = await request.send();
-    if (response.statusCode == 200) {
-      print('Image uploaded!');
-    } else {
-      print('Upload failed');
-    }
-  }
   void _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
-
     if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
       throw Exception('Could not launch $url');
     }
@@ -91,6 +107,7 @@ class _ProfileState extends State<Profile> {
       email = sharedPref.getString('email') ?? '';
       number = sharedPref.getString('number') ?? '';
       id = sharedPref.getInt('id') ?? 0;
+      _profileImageUrl = sharedPref.getString('profile_image_url');
     });
   }
 
@@ -173,12 +190,9 @@ class _ProfileState extends State<Profile> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
 
-        // Delete image if exists
         if (_profileImage != null && await _profileImage!.exists()) {
           await _profileImage!.delete();
           print("Image deleted");
-        } else {
-          print("No image found to delete");
         }
 
         if (!mounted) return;
@@ -189,7 +203,6 @@ class _ProfileState extends State<Profile> {
 
         await Future.delayed(const Duration(milliseconds: 300));
 
-        // Navigate to LoginPage
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => const LoginPage()),
@@ -208,8 +221,6 @@ class _ProfileState extends State<Profile> {
       );
     }
   }
-
-
 
   void _confirmDeleteAccount() {
     showDialog(
@@ -284,8 +295,6 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -327,6 +336,8 @@ class _ProfileState extends State<Profile> {
                             backgroundColor: Colors.blue.shade100,
                             backgroundImage: _profileImage != null
                                 ? FileImage(_profileImage!)
+                                : _profileImageUrl != null
+                                ? NetworkImage(_profileImageUrl!)
                                 : AssetImage(AppImages.profile) as ImageProvider,
                           ),
                         ),
@@ -342,10 +353,8 @@ class _ProfileState extends State<Profile> {
                             ),
                           ),
                         ),
-
                       ],
                     ),
-
                     const SizedBox(height: 12),
                     Text(
                       name,
@@ -360,15 +369,12 @@ class _ProfileState extends State<Profile> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
               _infoTile("Email", email, Icons.email),
               _infoTile("Phone", number, Icons.phone),
-
               const SizedBox(height: 20),
               const Divider(color: Colors.black12),
               const SizedBox(height: 10),
-
               _optionTile("Privacy Policies", Icons.shield_outlined, () {
                 _launchURL("https://theverify.in/PrivacyPolicy.html");
               }),
@@ -381,7 +387,6 @@ class _ProfileState extends State<Profile> {
               _optionTile("Help & Support", Icons.help_outline, () {
                 _launchURL("https://theverify.in/contact.html");
               }),
-
               const SizedBox(height: 30),
               const Center(
                 child: Text(
@@ -390,7 +395,6 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               const SizedBox(height: 30),
-
               ElevatedButton.icon(
                 onPressed: _logout,
                 icon: const Icon(Icons.logout),
@@ -415,7 +419,6 @@ class _ProfileState extends State<Profile> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
-
             ],
           ),
         ),

@@ -65,7 +65,7 @@ class SearchPropertyCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
                 children: [
-                  Expanded(child: _nestedSpecCard(Icons.meeting_room, "${item.floor}")),
+                  Expanded(child: _nestedSpecCard(Icons.meeting_room, "${item.bhkSquarefit}")),
                   const SizedBox(width: 6),
                   Expanded(child: _nestedSpecCard(Icons.bathtub, item.bathroom)),
                   const SizedBox(width: 6),
