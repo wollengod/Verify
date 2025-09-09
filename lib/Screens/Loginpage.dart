@@ -46,12 +46,14 @@ class _LoginPageState extends State<LoginPage> {
       final String emailFromAPI = data['user']['Email'];       // fixed casing
       final int IDFromAPI = data['user']['id'];                // already an int
       final String mobileFromAPI = data['user']['Mobile'];
+      //final String profileFromAPI = data['user']['profile'];
       //Login saved here.
       var shared_pref= await SharedPreferences.getInstance();
       await shared_pref.setBool(SplashScreenState.KEY_LOGIN, true);
       await shared_pref.setString('name', fullNameFromAPI);
       await shared_pref.setString('email', emailFromAPI);
       await shared_pref.setString('number', mobileFromAPI);
+      //await shared_pref.setString('profile', profileFromAPI);
       await shared_pref.setInt('id', IDFromAPI);
 
       //profile(fullNameFromAPI,emailFromAPI,IDFromAPI);

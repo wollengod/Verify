@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:verify/Themes/theme-helper.dart';
 import 'package:verify/utilities/hex_color.dart';
 import '../../../custom_widget/Paths.dart';
 import '../../../custom_widget/Preview.dart';
 import '../../../custom_widget/back_button.dart';
-import '../../../model/Home_model.dart';
+import '../../../model/detailed_property_model.dart';
 import '../../../model/image_model.dart';
 
 class Full_Property extends StatefulWidget {
@@ -18,13 +20,14 @@ class Full_Property extends StatefulWidget {
 }
 
 class _Full_PropertyState extends State<Full_Property> {
-  late Future<List<Catid>> _propertyFuture;
+  Future<List<DetailedPropertyModel>>_propertyFuture = Future.value([]);
   late Future<List<RealEstateSlider>> _sliderFuture;
 
   @override
   void initState() {
     super.initState();
     _loadAllData();
+
   }
 
   Future<void> _loadAllData() async {
@@ -40,12 +43,25 @@ class _Full_PropertyState extends State<Full_Property> {
     return prefs.getInt('id_Building')?.toString();
   }
 
-  Future<List<Catid>> fetchProperty(String? id) async {
+  Future<List<DetailedPropertyModel>> fetchProperty(String? id) async {
     final response = await http.get(Uri.parse(
-        "https://verifyserve.social/WebService4.asmx/Show_proprty_realstate_by_originalid?PVR_id=$id"));
+        "https://verifyserve.social/Second%20PHP%20FILE/main_application/details_page.php?P_id=$id"));
+
     if (response.statusCode == 200) {
-      final List data = json.decode(response.body);
-      return data.map((e) => Catid.FromJson(e)).toList();
+      final decoded = json.decode(response.body);
+
+      if (decoded is Map<String, dynamic> && decoded['success'] == true) {
+        final data = decoded['data'];
+        if (data is List) {
+          return data
+              .map<DetailedPropertyModel>((e) => DetailedPropertyModel.fromJson(e))
+              .toList();
+        } else {
+          throw Exception("Unexpected 'data' format: ${data.runtimeType}");
+        }
+      } else {
+        throw Exception("API returned failure or invalid format");
+      }
     } else {
       throw Exception('Failed to load property');
     }
@@ -53,14 +69,68 @@ class _Full_PropertyState extends State<Full_Property> {
 
   Future<List<RealEstateSlider>> fetchSlider(String? id) async {
     final response = await http.get(Uri.parse(
-        "https://verifyserve.social/WebService4.asmx/Show_Image_under_Realestatet?id_num=$id"));
+        "https://verifyserve.social/Second%20PHP%20FILE/main_realestate_for_website/show_multiple_image_in_main_realestate.php?subid=$id"));
+
     if (response.statusCode == 200) {
-      final List data = json.decode(response.body);
-      return data.map((e) => RealEstateSlider.fromJson(e)).toList();
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+      if (jsonResponse['success'] == true) {
+        final List data = jsonResponse['data'];
+        return data.map((e) => RealEstateSlider.fromJson(e)).toList();
+      } else {
+        throw Exception('API returned success = false');
+      }
     } else {
       throw Exception('Failed to load images');
     }
   }
+
+  final bookingDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+
+  Future<void> bookSchedule({
+    required String id,
+    required String location,
+    required String info,
+    required String furnished,
+    required String bhk,
+    required String type,
+    required String userId,
+    required String userName,
+    required String phoneNumber,
+    required String address, // user’s address or property address
+  }) async {
+    final url = Uri.parse(
+        'https://verifyserve.social/Second%20PHP%20FILE/book_shedual/book_shedual.php');
+
+    final body = {
+      'user_ids': userId,
+      'user_names': userName,
+      'property_id': id,
+      'locations': location,
+      'booking_date': bookingDate,
+      'descriptions': info,
+      'furnished': furnished,
+      'addresss': address,
+      'BHK': bhk,
+      'type_of_property': type,
+      'phone_number': phoneNumber,
+    };
+
+    final response = await http.post(url, body: body);
+
+    if (response.statusCode == 200 && response.body.contains('success')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Booking Successful')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking Failed: ${response.body}')),
+      );
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -72,16 +142,32 @@ class _Full_PropertyState extends State<Full_Property> {
         title: Image.asset(AppImages.logo2, height: 70),
         centerTitle: true,
         backgroundColor: "#001234".toColor(),
+        surfaceTintColor: "#001234".toColor(),
+
       ),
       body: SafeArea(
-        child: FutureBuilder<List<Catid>>(
+        child: FutureBuilder<List<DetailedPropertyModel>>(
           future: _propertyFuture,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.black),
+              );
             }
 
-            final data = snapshot.data!.first;
+            if (snapshot.hasError) {
+              return Center(child: Row(
+                children: [
+                  Text("Error: ${snapshot.error}",style: TextStyle(color: AppColors.bgColor(context),fontSize: 13),),
+                ],
+              ));
+            }
+
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text("No property data found"));
+            }
+
+            final data = snapshot.data!.first; // safe now
 
             return Column(
               children: [
@@ -89,10 +175,31 @@ class _Full_PropertyState extends State<Full_Property> {
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
+
+                      Hero(
+                        tag: 'property-image-${data.id}',
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            'https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${data.propertyPhoto}',
+                            height: 220,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+
                       FutureBuilder<List<RealEstateSlider>>(
                         future: _sliderFuture,
                         builder: (context, sliderSnap) {
-                          return buildImageCarousel(data, sliderSnap.data ?? []);
+                          if (sliderSnap.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                          if (sliderSnap.hasError) {
+                            return Center(child: Text("Error loading images"));
+                          }
+                          final slider_data = sliderSnap.data!.first; // safe now
+                          return buildImageCarousel(slider_data, sliderSnap.data ?? []);
                         },
                       ),
                       const SizedBox(height: 5),
@@ -102,18 +209,25 @@ class _Full_PropertyState extends State<Full_Property> {
                       const SizedBox(height: 20),
                       buildDetailsGrid(data),
                       const SizedBox(height: 20),
-                      buildStaticInfoSection(),
+                      buildStaticInfoSection(data.floor,data.ageOfProperty,data.totalFloor,"${data.location} Metro"),
                       const SizedBox(height: 20),
-                      Text("Description",
-                          style: GoogleFonts.poppins(color: Colors.black,
-                              fontSize: 18, fontWeight: FontWeight.w600)),
+                      Text(
+                        "Available Facilities",
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const Divider(color: Colors.black),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          data.Building_information,
-                          style:
-                          GoogleFonts.poppins(fontSize: 15, color: Colors.black87),
+                          data.facility,
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                       const Divider(color: Colors.black),
@@ -125,10 +239,12 @@ class _Full_PropertyState extends State<Full_Property> {
           },
         ),
       ),
-      bottomNavigationBar: FutureBuilder<List<Catid>>(
+      bottomNavigationBar: FutureBuilder<List<DetailedPropertyModel>>(
           future: _propertyFuture,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) return const SizedBox();
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const SizedBox(); // nothing to show
+            }
             final data = snapshot.data!.first;
             return Material(
               elevation: 10,
@@ -138,15 +254,40 @@ class _Full_PropertyState extends State<Full_Property> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('₹ ${data.Rent + data.Verify_price}',
+                    Text('₹ ${data.showPrice}',
                         style: GoogleFonts.poppins(
                             fontSize: 20,
                             color: "#001234".toColor(),
                             fontWeight: FontWeight.bold)),
                     ElevatedButton(
-                      onPressed: () {
-                        // Add your booking logic here
+                      onPressed: () async {
+                        final propertyList = await _propertyFuture;
+                        final sliderList = await _sliderFuture;
+
+                        if (propertyList.isEmpty) return;
+                        final property = propertyList.first;
+
+                        final prefs = await SharedPreferences.getInstance();
+                        final userId = prefs.getInt("id") ?? "0";
+                        final name = prefs.getString("name") ?? "0";
+                        final number = prefs.getString("number") ?? "0";
+
+
+                        await bookSchedule(
+                          userId: userId.toString(),
+                          userName: name,
+                          phoneNumber: number,
+                          address: data.apartmentAddress,
+                          id: data.id.toString(),
+                          location: data.location,
+                          info: data.facility,
+                          furnished: data.furnished,
+                          bhk: data.bhk,
+                          type: data.typeOfProperty,
+                        );
+
                       },
+  
                       style: ElevatedButton.styleFrom(
                         backgroundColor: "#001234".toColor(),
                         shape: RoundedRectangleBorder(
@@ -182,22 +323,11 @@ class _Full_PropertyState extends State<Full_Property> {
     );
   }
 
-  Widget buildImageCarousel(Catid data, List<RealEstateSlider> sliders) {
+  Widget buildImageCarousel(RealEstateSlider data, List<RealEstateSlider> sliders) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Hero(
-          tag: 'property-image-${data.id}',
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              'https://verifyserve.social/${data.Building_image}',
-              height: 220,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+
         const SizedBox(height: 12),
         SizedBox(
           height: 70,
@@ -206,13 +336,13 @@ class _Full_PropertyState extends State<Full_Property> {
             itemCount: sliders.length,
             separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
-              final img = sliders[index].rimg!;
+              final img = sliders[index].image!;
               return GestureDetector(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => ImagePreviewScreen(
-                      imageUrls: sliders.map((e) => e.rimg!).toList(),
+                      imageUrls: sliders.map((e) => e.image!).toList(),
                       initialIndex: index,
                     ),
                   ),
@@ -220,7 +350,7 @@ class _Full_PropertyState extends State<Full_Property> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    'https://verifyserve.social/$img',
+                    'https://verifyserve.social/Second%20PHP%20FILE/main_realestate/$img',
                     width: 80,
                     height: 70,
                     fit: BoxFit.cover,
@@ -248,27 +378,27 @@ class _Full_PropertyState extends State<Full_Property> {
     );
   }
 
-  Widget buildStaticInfoSection() {
+  Widget buildStaticInfoSection(String floor,String Age,String total_floor,metro) {
     final List<Map<String, dynamic>> infoList = [
       {
-        'icon': Icons.double_arrow_outlined,
-        'title': 'Facing',
-        'value': 'East',
+        'icon': Icons.train,
+        'title': 'Nearest Metro',
+        'value': metro,
       },
       {
         'icon': Icons.home_work_outlined,
         'title': 'Property Age',
-        'value': '5-10 Years',
+        'value': Age,
       },
       {
         'icon': Icons.stairs,
         'title': 'Total Floors',
-        'value': '4',
+        'value': total_floor,
       },
       {
         'icon': Icons.store_mall_directory,
         'title': 'On Floor',
-        'value': '2nd',
+        'value': floor,
       },
       {
         'icon': Icons.lightbulb_outline,
@@ -315,31 +445,33 @@ class _Full_PropertyState extends State<Full_Property> {
   }
 
 
-  Widget buildTitleLocation(Catid data) {
+  Widget buildTitleLocation(DetailedPropertyModel data) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 5,),
         Row(
           children: [
-            Text("${data.BHK} ${data.tyope} in ",
+            Text("${data.bhk} ${data.typeOfProperty} For ${data.buyRent} in ",
                 style: GoogleFonts.poppins(
-                    fontSize: 22, fontWeight: FontWeight.w400,color: Colors.black87)),
-            Text(data.Building_Location,
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600,
-                    fontSize: 20, color: Colors.blue.shade900)),
+                    fontSize: 20, fontWeight: FontWeight.w400,color: Colors.black87)),
           ],
         ),
+        SizedBox(height: 2,),
+        Text(data.location,
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600,
+                fontSize: 20, color: Colors.blue.shade900)),
       ],
     );
   }
 
-  Widget buildChips(Catid data) {
+  Widget buildChips(DetailedPropertyModel data) {
     return Wrap(
       spacing: 10,
       children: [
-        chip(Icons.check_circle, data.Furnished),
+        chip(Icons.check_circle, data.furnished),
         chip(Icons.balcony, data.balcony),
-        chip(Icons.local_parking, data.Parking),
+        chip(Icons.local_parking, data.parking),
         chip(Icons.account_balance_wallet, 'Budget friendly'),
       ],
     );
@@ -354,14 +486,14 @@ class _Full_PropertyState extends State<Full_Property> {
     );
   }
 
-  Widget buildDetailsGrid(Catid data) {
+  Widget buildDetailsGrid(DetailedPropertyModel data) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        statTile(Icons.bed, data.BHK, 'Bed'),
-        statTile(Icons.bathtub, data.Baathroom, 'Bath'),
-        statTile(Icons.house, data.tyope, 'Property'),
-        statTile(Icons.square_foot, '900', 'Sqft'),
+        statTile(Icons.bed, data.bhk, 'Bed'),
+        statTile(Icons.bathtub, data.bathroom, 'Bath'),
+        statTile(Icons.house, data.residenceCommercial, 'Property'),
+        statTile(Icons.flip_to_front_outlined, data.squarefit, 'Sqft'),
       ],
     );
   }

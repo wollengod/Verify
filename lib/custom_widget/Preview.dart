@@ -29,6 +29,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // print(widget.imageUrls);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -39,7 +40,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
             onPageChanged: (index) => setState(() => _currentIndex = index),
             builder: (context, index) {
               return PhotoViewGalleryPageOptions(
-                imageProvider: NetworkImage('https://verifyserve.social/${widget.imageUrls[index]}'),
+                imageProvider: NetworkImage('https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${widget.imageUrls[index]}'),
                 minScale: PhotoViewComputedScale.contained,
                 maxScale: PhotoViewComputedScale.covered * 3.0,
                 initialScale: PhotoViewComputedScale.contained,

@@ -1,7 +1,7 @@
-class OfficePropertyModel {
-  final String pId;
+class DetailedPropertyModel {
+  final int id;
   final String propertyPhoto;
-  final String locations;
+  final String location;
   final String flatNumber;
   final String buyRent;
   final String residenceCommercial;
@@ -16,10 +16,10 @@ class OfficePropertyModel {
   final String totalFloor;
   final String balcony;
   final String squarefit;
-  final String maintance;
+  final String maintenance;
   final String parking;
   final String ageOfProperty;
-  final String fieldworkarAddress;
+  final String fieldworkerAddress;
   final String roadSize;
   final String metroDistance;
   final String highwayDistance;
@@ -27,30 +27,24 @@ class OfficePropertyModel {
   final String meter;
   final String ownerName;
   final String ownerNumber;
-  final String currentDates;
-  final String availableDate;
   final String kitchen;
   final String bathroom;
   final String lift;
   final String facility;
-  final String furnishedUnfurnished;
-  final String fieldWorkerName;
+  final String furnished;
+  final String fieldworkerName;
   final String liveUnlive;
-  final String fieldWorkerNumber;
-  final String registryAndGpa;
-  final String loan;
+  final String fieldworkerNumber;
   final String longitude;
   final String latitude;
   final String videoLink;
-  final String fieldWorkerCurrentLocation;
   final String careTakerName;
   final String careTakerNumber;
-  final String subId;
 
-  OfficePropertyModel({
-    required this.pId,
+  DetailedPropertyModel({
+    required this.id,
     required this.propertyPhoto,
-    required this.locations,
+    required this.location,
     required this.flatNumber,
     required this.buyRent,
     required this.residenceCommercial,
@@ -65,10 +59,10 @@ class OfficePropertyModel {
     required this.totalFloor,
     required this.balcony,
     required this.squarefit,
-    required this.maintance,
+    required this.maintenance,
     required this.parking,
     required this.ageOfProperty,
-    required this.fieldworkarAddress,
+    required this.fieldworkerAddress,
     required this.roadSize,
     required this.metroDistance,
     required this.highwayDistance,
@@ -76,32 +70,26 @@ class OfficePropertyModel {
     required this.meter,
     required this.ownerName,
     required this.ownerNumber,
-    required this.currentDates,
-    required this.availableDate,
     required this.kitchen,
     required this.bathroom,
     required this.lift,
     required this.facility,
-    required this.furnishedUnfurnished,
-    required this.fieldWorkerName,
+    required this.furnished,
+    required this.fieldworkerName,
     required this.liveUnlive,
-    required this.fieldWorkerNumber,
-    required this.registryAndGpa,
-    required this.loan,
+    required this.fieldworkerNumber,
     required this.longitude,
     required this.latitude,
     required this.videoLink,
-    required this.fieldWorkerCurrentLocation,
     required this.careTakerName,
     required this.careTakerNumber,
-    required this.subId,
   });
 
-  factory OfficePropertyModel.fromJson(Map<String, dynamic> json) {
-    return OfficePropertyModel(
-      pId: json['P_id'] ?? '',
+  factory DetailedPropertyModel.fromJson(Map<String, dynamic> json) {
+    return DetailedPropertyModel(
+      id: int.tryParse(json['P_id'].toString()) ?? 0,
       propertyPhoto: json['property_photo'] ?? '',
-      locations: json['locations'] ?? '',
+      location: json['locations'] ?? '',
       flatNumber: json['Flat_number'] ?? '',
       buyRent: json['Buy_Rent'] ?? '',
       residenceCommercial: json['Residence_Commercial'] ?? '',
@@ -116,10 +104,10 @@ class OfficePropertyModel {
       totalFloor: json['Total_floor'] ?? '',
       balcony: json['Balcony'] ?? '',
       squarefit: json['squarefit'] ?? '',
-      maintance: json['maintance'] ?? '',
+      maintenance: json['maintance'] ?? '',
       parking: json['parking'] ?? '',
       ageOfProperty: json['age_of_property'] ?? '',
-      fieldworkarAddress: json['fieldworkar_address'] ?? '',
+      fieldworkerAddress: json['fieldworkar_address'] ?? '',
       roadSize: json['Road_Size'] ?? '',
       metroDistance: json['metro_distance'] ?? '',
       highwayDistance: json['highway_distance'] ?? '',
@@ -127,25 +115,19 @@ class OfficePropertyModel {
       meter: json['meter'] ?? '',
       ownerName: json['owner_name'] ?? '',
       ownerNumber: json['owner_number'] ?? '',
-      currentDates: json['current_dates'] ?? '',
-      availableDate: json['available_date'] ?? '',
       kitchen: json['kitchen'] ?? '',
       bathroom: json['bathroom'] ?? '',
       lift: json['lift'] ?? '',
       facility: json['Facility'] ?? '',
-      furnishedUnfurnished: json['furnished_unfurnished'] ?? '',
-      fieldWorkerName: json['field_warkar_name'] ?? '',
+      furnished: json['furnished_unfurnished'] ?? '',
+      fieldworkerName: json['field_warkar_name'] ?? '',
       liveUnlive: json['live_unlive'] ?? '',
-      fieldWorkerNumber: json['field_workar_number'] ?? '',
-      registryAndGpa: json['registry_and_gpa'] ?? '',
-      loan: json['loan'] ?? '',
+      fieldworkerNumber: json['field_workar_number'] ?? '',
       longitude: json['Longitude'] ?? '',
       latitude: json['Latitude'] ?? '',
       videoLink: json['video_link'] ?? '',
-      fieldWorkerCurrentLocation: json['field_worker_current_location'] ?? '',
       careTakerName: json['care_taker_name'] ?? '',
       careTakerNumber: json['care_taker_number'] ?? '',
-      subId: json['subid'] ?? '',
     );
   }
 }

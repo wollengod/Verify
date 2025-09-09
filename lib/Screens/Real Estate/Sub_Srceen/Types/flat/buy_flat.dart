@@ -21,15 +21,23 @@ class _FlatPropertyBuyState extends State<FlatPropertyBuy> {
   }
 
   Future<List<OfficePropertyModel>> fetchOfficeProperties() async {
-    final url = Uri.parse("https://verifyserve.social/Second%20PHP%20FILE/show_data_sale_property/show_data_for_sale_property.php");
+    final url = Uri.parse(
+      "https://verifyserve.social/Second%20PHP%20FILE/main_application/show_data_for_sale_property.php",
+    );
 
     final response = await http.get(url);
+
     if (response.statusCode == 200) {
-      final List data = json.decode(response.body);
-      data.sort((a, b) => b['PVR_id'].compareTo(a['PVR_id'])); //descending
-      return data.map((item) => OfficePropertyModel.fromJson(item)).toList();
+      final List<dynamic> data = json.decode(response.body);
+
+      // sort descending by P_id
+      data.sort((a, b) => (b['P_id'] ?? '0').compareTo(a['P_id'] ?? '0'));
+
+      return data
+          .map((item) => OfficePropertyModel.fromJson(item as Map<String, dynamic>))
+          .toList();
     } else {
-      throw Exception('Failed to load buy flat properties');
+      throw Exception('Failed to load office properties');
     }
   }
 

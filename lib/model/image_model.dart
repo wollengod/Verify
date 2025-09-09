@@ -1,21 +1,18 @@
 class RealEstateSlider {
-  int? id;
-  String? rimg;
-  int? pid;
+  int? subid;
+  String? image;
 
-  RealEstateSlider({this.id, this.rimg, this.pid});
+  RealEstateSlider({this.subid, this.image});
 
   RealEstateSlider.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    rimg = json['imagepath'];
-    pid = json['imagename'];
+    subid = json['subid'];
+    image = json['M_images'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['imagepath'] = this.rimg;
-    data['imagename'] = this.pid;
+    final Map<String, dynamic> data = {};
+    data['subid'] = subid;
+    data['M_images'] = image;
     return data;
   }
 }

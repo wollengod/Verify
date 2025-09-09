@@ -16,6 +16,7 @@ class HealthPage extends StatelessWidget {
       Image.asset(AppImages.logo2, height: 70),
       centerTitle: true,
       backgroundColor: "#001234".toColor(),
+      surfaceTintColor: "#001234".toColor(),
       leading: CustomBackButton(),
     ),
     body: SingleChildScrollView(

@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:verify/utilities/hex_color.dart';
 import '../../Themes/theme-helper.dart';
@@ -19,6 +22,7 @@ class ServiceBookingPage extends StatefulWidget {
     required this.serviceID,
   });
 
+
   @override
   State<ServiceBookingPage> createState() => _ServiceBookingPageState();
 }
@@ -31,8 +35,18 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
   final String googleApiKey = "AIzaSyBukKQrrZmGS1KOh2Kyc_G_nHhIzse6gPE";
   List<String> placeSuggestions = [];
   Timer? _debounce;
+  double? latitude;
+  double? longitude;
+  String full_address = '';
+  final TextEditingController _Longitude = TextEditingController();
+  final TextEditingController _Latitude = TextEditingController();
 
 
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
 
   final List<String> timeSlots = [
     '09:00 AM - 12:00 PM',
@@ -51,6 +65,41 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
       ),
     );
   }
+
+
+  Future<void> _getCurrentLocation() async {
+    if (await _checkLocationPermission()) {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        latitude = position.latitude;
+        longitude = position.longitude;
+        _Latitude.text = latitude.toString();
+        _Longitude.text = longitude.toString();
+      });
+    } else {
+      await _requestLocationPermission();
+    }
+  }
+
+  Future<bool> _checkLocationPermission() async {
+    var status = await Permission.location.status;
+    return status == PermissionStatus.granted;
+  }
+
+  Future<void> _requestLocationPermission() async {
+    var status = await Permission.location.request();
+    if (status == PermissionStatus.granted) {
+      // Permission granted, try getting the location again
+      await _getCurrentLocation();
+    } else {
+      // Permission denied, handle accordingly
+      print('Location permission denied');
+    }
+  }
+
   void fetchPlaceSuggestions(String input) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () async {
@@ -143,6 +192,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
         Image.asset(AppImages.logo2, height: 70),
         centerTitle: true,
         backgroundColor: "#001234".toColor(),
+        surfaceTintColor: "#001234".toColor(),
         leading: CustomBackButton(),
       ),
       body: Stack(
@@ -193,7 +243,65 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
                   ),
                 ),
                 //buildLocationField(Colors.black),
+                const SizedBox(height: 8),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(width: 1, color: Colors.grey.shade600),
+                  ),
+                  child: Text.rich(
+                      TextSpan(
+                          text: 'Note :',
+                          style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: Colors.black,fontFamily: 'Poppins',letterSpacing: 0),
+                          children: <InlineSpan>[
+                            TextSpan(
+                              text: ' Enter Address manually or get your current Address from one tap on location icon.',
+                              style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500,color: Colors.grey.shade900,fontFamily: 'Poppins',letterSpacing: 0),
+                            )
+                          ]
+                      )),
+                ),
+                SizedBox(height: 20),
+                InkWell(
+                  onTap: () async {
+                    if (latitude != null && longitude != null) {
+                      try {
+                        List<Placemark> placemarks = await placemarkFromCoordinates(latitude!, longitude!);
 
+                        if (placemarks.isNotEmpty) {
+                          Placemark place = placemarks.first;
+                          String output = "${place.street}, ${place.locality}, ${place.subLocality}, "
+                              "${place.administrativeArea}, ${place.subAdministrativeArea}, "
+                              "${place.country}, ${place.postalCode}";
+
+                          setState(() {
+                            full_address = output;
+                            locationController.text = full_address;
+                          });
+
+                          print('Your Current Address: $full_address');
+                        }
+                      } catch (e) {
+                        print("Error fetching placemark: $e");
+                      }
+                    } else {
+                      showSnack("⚠️ Location not available", error: true);
+                    }
+                  },
+
+                  child: Container(
+
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(topRight: Radius.circular(0),topLeft: Radius.circular(0),bottomRight: Radius.circular(10),bottomLeft: Radius.circular(10)),
+                        border: Border.all(width: 1, color: Colors.blue),
+                        color: Colors.blue.shade600
+                    ),
+                    child: Center(child: Text('Get Current Location',style: TextStyle(fontSize: 13,fontWeight: FontWeight.w400,color: Colors.white,fontFamily: 'Poppins',letterSpacing: 1),)),
+                  ),
+                ),
                 const SizedBox(height: 24),
 
                 buildPriceSummary(Colors.white, Colors.black),
@@ -326,6 +434,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
       ],
     );
   }
+
 
   Widget buildPriceSummary(Color cardColor, Color textColor) {
     return Container(

@@ -10,7 +10,6 @@ import '../../custom_widget/Paths.dart';
 import '../../model/All_model.dart';
 import 'Sub_Srceen/PropertyBylist.dart';
 import 'Sub_Srceen/Types/flat/Rent_flat.dart';
-import 'Sub_Srceen/Types/flat/buy_flat.dart';
 import 'Sub_Srceen/Types/Godown.dart';
 import 'Sub_Srceen/Types/Office.dart';
 import 'Sub_Srceen/Types/farmhouse.dart';
@@ -87,20 +86,25 @@ class _AllPropertyState extends State<AllProperty> {
     final selectedType = propertyTypes[index]['label'];
 
     if (selectedType == 'Office') {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const OfficePropertyPage()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (_) => const OfficePropertyPage()));
     }
     else if (selectedType == 'Godown') {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const GodownPropertyPage()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (_) => const GodownPropertyPage()));
     }
     else if (selectedType == 'Shop') {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopPropertyPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const ShopPropertyPage()));
     }
 
     else if (selectedType == 'Farmhouse') {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmhousePropertyPage()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (_) => const FarmhousePropertyPage()));
     }
     else if (selectedType == 'Flat') {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const FlatPropertyPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const FlatPropertyPage()));
     }
     else {
       // Fallback
@@ -112,17 +116,6 @@ class _AllPropertyState extends State<AllProperty> {
       );
     }
   }
-
-
-  // void handleTap(int index) {  //hold
-  //   setState(() {
-  //     for (int i = 0; i < propertyTypes.length; i++) {
-  //       propertyTypes[i]['selected'] = i == index;
-  //     }
-  //   });
-  //
-  //   print("Tapped: ${propertyTypes[index]['label']}");
-  // }
 
   @override
   Widget build(BuildContext context) {

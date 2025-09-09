@@ -41,20 +41,22 @@ class _ServicePageState extends State<ServicePage> {
     return Scaffold(
      backgroundColor:  "#EEF5FF".toColor(),
       appBar: AppBar(
-        title:
-        Image.asset(AppImages.logo2, height: 70),
+        title: Image.asset(AppImages.logo2, height: 70),
         centerTitle: true,
         backgroundColor: "#001234".toColor(),
+        surfaceTintColor: "#001234".toColor(),
+
         leading: CustomBackButton(),
       ),
       body: Column(
         children: [
           Container(
-            margin: EdgeInsets.all(10.0),
+           // margin: EdgeInsets.all(10.0),
+            decoration: BoxDecoration(color: "#001234".toColor(),),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                 Text("Our Services", style: TextStyle(fontFamily: 'Poppins',fontSize: 20,color: Colors.black,fontWeight: FontWeight.w500))
+                 Text("Available Services", style: TextStyle(fontFamily: 'Poppins',fontSize: 23,color: Colors.white,fontWeight: FontWeight.w500))
               ],
             ),
           ),
@@ -155,7 +157,6 @@ class _ServicePageState extends State<ServicePage> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(12),
               child: Text(

@@ -15,6 +15,8 @@ class Motor extends StatelessWidget {
       Image.asset(AppImages.logo2, height: 70),
       centerTitle: true,
       backgroundColor: "#001234".toColor(),
+      surfaceTintColor: "#001234".toColor(),
+
       leading: CustomBackButton(),
     ),
     body: SingleChildScrollView(
@@ -51,6 +53,7 @@ class Motor extends StatelessWidget {
               color: Colors.blue,
             ),
           ),
+
           SizedBox(height: 30),
           CircularProgressIndicator(
             color: Colors.black,

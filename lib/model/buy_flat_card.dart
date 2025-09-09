@@ -12,7 +12,7 @@ class BuyFlatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String displayPrice = item.price.trim();
+    String displayPrice = item.showPrice.trim();
     String? numericOnly = displayPrice.replaceAll(RegExp(r'[^\d]'), '');
     bool isPureNumber = RegExp(r'^\d+$').hasMatch(displayPrice);
 
@@ -24,7 +24,7 @@ class BuyFlatCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('id_Building', int.parse(item.pvrId));
+        prefs.setInt('id_Building', int.parse(item.pId));
         prefs.setString('id_Longitude', item.longitude);
         prefs.setString('id_Latitude', item.latitude);
         Navigator.push(context, MaterialPageRoute(builder: (_) => const Full_Property()));
@@ -43,7 +43,7 @@ class BuyFlatCard extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        "https://verifyserve.social/${item.realstateImage}",
+                        "https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -65,11 +65,11 @@ class BuyFlatCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
                 children: [
-                  Expanded(child: _nestedSpecCard(Icons.bed, "${item.floor}")),
+                  Expanded(child: _nestedSpecCard(Icons.bed, "${item.bhk}")),
                   const SizedBox(width: 6),
                   Expanded(child: _nestedSpecCard(Icons.bathtub, item.bathroom)),
                   const SizedBox(width: 6),
-                  Expanded(child: _nestedSpecCard(Icons.square_foot, "2000 Ft")),
+                  Expanded(child: _nestedSpecCard(Icons.square_foot, "900 Ft")),
                 ],
               ),
             ),
@@ -103,7 +103,7 @@ class BuyFlatCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item.place.isNotEmpty ? item.place : "Unknown",
+                              item.locations.isNotEmpty ? item.locations : "Unknown",
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 15,
@@ -148,7 +148,7 @@ class BuyFlatCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 16, color: Colors.black87),
-            const SizedBox(width: 13),
+            const SizedBox(width: 10),
             Flexible(
               child: Text(
                 label,

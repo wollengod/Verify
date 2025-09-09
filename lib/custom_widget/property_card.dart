@@ -12,7 +12,7 @@ class PropertyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String displayPrice = item.propertyNumber.trim();
+    String displayPrice = item.showPrice.trim();
 
     String? numericOnly = displayPrice.replaceAll(RegExp(r'[^\d]'), '');
     bool isPureNumber = RegExp(r'^\d+$').hasMatch(displayPrice);
@@ -25,7 +25,7 @@ class PropertyCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('id_Building', int.parse(item.pvrId));
+        prefs.setInt('id_Building', int.parse(item.pId));
         prefs.setString('id_Longitude', item.longitude);
         prefs.setString('id_Latitude', item.latitude);
         Navigator.push(context, MaterialPageRoute(builder: (_) => const Full_Property()));
@@ -50,12 +50,13 @@ class PropertyCard extends StatelessWidget {
                         bottomRight: Radius.circular(10),
                       ),
                       child: Image.network(
-                        "https://verifyserve.social/${item.realstateImage}",
+                        "https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           height: 160,
+                          width: double.infinity,
                           color: Colors.grey.shade200,
                           child: const Icon(Icons.image_not_supported, size: 40),
                         ),
@@ -72,7 +73,7 @@ class PropertyCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
                 children: [
-                  Expanded(child: _nestedSpecCard(Icons.bed, "${item.bhkSquarefit}")),
+                  Expanded(child: _nestedSpecCard(Icons.bed, "${item.bhk}")),
                   const SizedBox(width: 6),
                   Expanded(child: _nestedSpecCard(Icons.bathtub, item.bathroom)),
                   const SizedBox(width: 6),
@@ -112,7 +113,7 @@ class PropertyCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item.place.isNotEmpty ? item.place : "Unknown",
+                              item.locations.isNotEmpty ? item.locations : "Unknown",
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -176,8 +177,6 @@ class PropertyCard extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _badge(String label, Color bgColor) {
     return Container(
