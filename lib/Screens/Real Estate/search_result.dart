@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:verify/custom_widget/back_button.dart';
 import '../../custom_widget/search_card.dart';
+import '../../model/Office_model.dart';
+import '../../model/filter_model.dart';
 import '../../model/search_model.dart';
 import 'Sub_Srceen/full property.dart';
 
@@ -17,7 +19,7 @@ class SearchResultPage extends StatefulWidget {
 }
 
 class _SearchResultPageState extends State<SearchResultPage> {
-  late Future<List<SearchModel>> _futureData;
+  late Future<List<FilterPropertyModel>> _futureData;
 
   @override
   void initState() {
@@ -25,7 +27,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
     _futureData = fetchSearchResults(widget.keyword);
   }
 
-  Future<List<SearchModel>> fetchSearchResults(String keyword) async {
+  Future<List<FilterPropertyModel>> fetchSearchResults(String keyword) async {
     final url = Uri.parse("https://verifyserve.social/Second%20PHP%20FILE/search%20api/search.php");
 
     final response = await http.post(
@@ -46,10 +48,10 @@ class _SearchResultPageState extends State<SearchResultPage> {
         final List rawList = jsonData['data'];
         print("✅ Raw data length: ${rawList.length}");
 
-        List<SearchModel> parsedList = [];
+        List<FilterPropertyModel> parsedList = [];
         for (var e in rawList) {
           try {
-            parsedList.add(SearchModel.fromJson(e));
+            parsedList.add(FilterPropertyModel.fromJson(e));
           } catch (err) {
             print("❌ Failed to parse item: $err\nItem: $e");
           }
@@ -72,7 +74,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
         backgroundColor: Colors.blue.shade900,
         leading: CustomBackButton(),
       ),
-      body: FutureBuilder<List<SearchModel>>(
+      body: FutureBuilder<List<FilterPropertyModel>>(
         future: _futureData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:verify/custom_widget/back_button.dart';
 import '../../custom_widget/Paths.dart';
-import '../../model/All_model.dart';
+import '../../model/Office_model.dart';
 import '../../model/filter_model.dart';
 import 'Sub_Srceen/full property.dart';
 
@@ -20,10 +20,11 @@ class _FilterPropertyState extends State<FilterProperty> {
   String selectedBuyRent = 'Buy';
   String selectedBHK = '1 BHK';
   String selectedPlace = 'Sultanpur';
+  String selectedProperty = 'Flat';
   bool isFiltering = false;
-  List<FilterModel> filteredData = [];
+  List<FilterPropertyModel> filteredData = [];
   bool noResult = false;
-  Future<List<AllModel>>? _futureData;
+  Future<List<OfficePropertyModel>>? _futureData;
   double _minBudget = 0.0;
   double _maxBudget = 500.0;
 
@@ -72,16 +73,13 @@ class _FilterPropertyState extends State<FilterProperty> {
       noResult = false;
     });
 
-    final queryParams = {
-      'Buy_Rent': selectedBuyRent,
-      'Place_': selectedPlace,
-      if (selectedBHK != 'All') 'Bhk_Squarefit': selectedBHK,
-    };
-
-    final uri = Uri.https(
-      'verifyserve.social',
-      '/WebService4.asmx/filter_all_category_data',
-      queryParams,
+    // Build query string
+    final uri = Uri.parse(
+      "https://verifyserve.social/WebService4.asmx/filter_main_application"
+          "?Buy_Rent=$selectedBuyRent"
+          "&Bhk=$selectedBHK"
+          "&Typeofproperty=$selectedProperty"
+          "&locations=$selectedPlace",
     );
 
     try {
@@ -93,7 +91,7 @@ class _FilterPropertyState extends State<FilterProperty> {
         if (decoded is List && decoded.isNotEmpty) {
           setState(() {
             filteredData = decoded
-                .map<FilterModel>((item) => FilterModel.fromJson(item))
+                .map<FilterPropertyModel>((item) => FilterPropertyModel.fromJson(item))
                 .toList();
             noResult = false;
           });
@@ -121,17 +119,17 @@ class _FilterPropertyState extends State<FilterProperty> {
 
 
 
-  Future<List<AllModel>> fetchData() async {
+  Future<List<OfficePropertyModel>> fetchData() async {
     final url = Uri.parse(
-        "https://verifyserve.social/PHP_Files/show_all_category_website_data/show_all_category_data.php");
+        "https://verifyserve.social/Second%20PHP%20FILE/main_application/all_data.php");
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
       List data = json.decode(response.body);
       //data.sort((a, b) => a['PVR_id'].compareTo(b['PVR_id'])); // ascending
-      data.sort((a, b) => b['PVR_id'].compareTo(a['PVR_id'])); //descending
+      data.sort((a, b) => b['P_id'].compareTo(a['P_id'])); //descending
 
-      return data.map((item) => AllModel.FromJson(item)).toList();
+      return data.map((item) => OfficePropertyModel.fromJson(item)).toList();
     } else {
       throw Exception('Failed to load data');
     }
@@ -150,6 +148,13 @@ class _FilterPropertyState extends State<FilterProperty> {
     'Chhattarpur',
     'Manglapuri',
     'Rajpur Khurd'
+  ];
+
+  final List<String> PropertyOptions = [
+    'Flat',
+    'Shop',
+    'Godown',
+    'Office',
   ];
 
   void clearFilters() {
@@ -260,7 +265,7 @@ class _FilterPropertyState extends State<FilterProperty> {
             Expanded(
               child: isFiltering || filteredData.isNotEmpty || noResult
                   ? _buildFilteredResults()
-                  : FutureBuilder<List<AllModel>>(
+                  : FutureBuilder<List<OfficePropertyModel>>(
                 future: _futureData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -357,6 +362,9 @@ class _FilterPropertyState extends State<FilterProperty> {
               }),
               _dropdownCard('Location Area', placeOptions, selectedPlace, (val) {
                 setState(() => selectedPlace = val!);
+              }),
+              _dropdownCard('Property Type', PropertyOptions, selectedProperty, (val) {
+                setState(() => selectedProperty = val!);
               }),
               _buildBudgetSlider(),
 
@@ -510,7 +518,7 @@ class _FilterPropertyState extends State<FilterProperty> {
     if (isFiltering) {
       return const Center(child: CircularProgressIndicator());
     } else if (noResult) {
-      return const Center(child: Text("No Properties Found!", style: TextStyle(fontSize: 18)));
+      return const Center(child: Text("No Properties Found!", style: TextStyle(fontSize: 18,color: Colors.black)));
     } else {
       return Column(
         children: [
@@ -553,13 +561,13 @@ class _FilterPropertyState extends State<FilterProperty> {
     }
   }
 
-  Widget recommendedPropertyCard(AllModel item) {
+  Widget recommendedPropertyCard(OfficePropertyModel item) {
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('id_Building', int.parse(item.id));
-        prefs.setString('id_Longitude', item.Longitude);
-        prefs.setString('id_Latitude', item.Latitude);
+        prefs.setInt('id_Building', int.parse(item.pId));
+        prefs.setString('id_Longitude', item.longitude);
+        prefs.setString('id_Latitude', item.latitude);
         Navigator.push(context, MaterialPageRoute(builder: (context) => const Full_Property()));
       },
       child: Card(
@@ -579,12 +587,13 @@ class _FilterPropertyState extends State<FilterProperty> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      "https://verifyserve.social/${item.Building_image}",
+                      "https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
                       height: 160,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
                         height: 160,
+                        width: double.infinity,
                         color: Colors.grey.shade200,
                         child: const Icon(Icons.image_not_supported, size: 40),
                       ),
@@ -593,27 +602,32 @@ class _FilterPropertyState extends State<FilterProperty> {
                   Positioned(
                     top: 10,
                     left: 10,
-                    child: _badge(item.buy_Rent, Colors.blue.shade800),
+                    child: _badge(item.buyRent, Colors.blue.shade800),
                   ),
                   Positioned(
                     top: 10,
                     right: 10,
-                    child: _badge(item.tyope, Colors.black.withOpacity(0.7)),
+                    child: _badge(item.typeOfProperty, Colors.black.withOpacity(0.7)),
                   ),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _nestedSpecCard(Icons.bed, "${item.BHK}"),
-                  _nestedSpecCard(Icons.bathtub, "${item.Baathroom} Bath"),
-                  _nestedSpecCard(Icons.square_foot, "1000 Ft"),
-                ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _nestedSpecCard(Icons.bed, "${item.bhk}"),
+                    const SizedBox(width: 8),
+                    _nestedSpecCard(Icons.bathtub, "${item.bathroom} Baths"),
+                    const SizedBox(width: 8),
+                    _nestedSpecCard(Icons.layers, "${item.squarefit} ft"),
+                  ],
+                ),
               ),
             ),
+
             const SizedBox(height: 8),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -626,7 +640,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                   child: Row(
                     children: [
                       Text(
-                        "₹ ${item.Verify_price}",
+                        "₹ ${item.showPrice}",
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -639,7 +653,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            item.Building_Location,
+                            item.locations,
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -648,7 +662,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                             ),
                           ),
                           Text(
-                            "New Delhi 110030",
+                            "New Delhi",
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey.shade600,
@@ -670,16 +684,16 @@ class _FilterPropertyState extends State<FilterProperty> {
   }
 
 
-  Widget propertyCard2(FilterModel item) {
-    final rawPrice = item.Property_Number;
+  Widget propertyCard2(FilterPropertyModel item) {
+    final rawPrice = item.showPrice;
 
 
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('id_Building', item.id);
-        prefs.setString('id_Longitude', item.Longtitude);
-        prefs.setString('id_Latitude', item.Latitude);
+        prefs.setInt('id_Building', item.pId);
+        prefs.setString('id_Longitude', item.longitude);
+        prefs.setString('id_Latitude', item.latitude);
         Navigator.push(context, MaterialPageRoute(builder: (context) => const Full_Property()));
       },
       child: Card(
@@ -699,12 +713,14 @@ class _FilterPropertyState extends State<FilterProperty> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      "https://verifyserve.social/${item.Realstate_image}",
+                      "https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
+
                       height: 160,
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
                         height: 160,
+                        width: double.infinity,
                         color: Colors.grey.shade200,
                         child: const Icon(Icons.image_not_supported, size: 40),
                       ),
@@ -713,25 +729,29 @@ class _FilterPropertyState extends State<FilterProperty> {
                   Positioned(
                     top: 10,
                     left: 10,
-                    child: _badge(item.Buy_Rent, Colors.blue.shade800),
+                    child: _badge(item.buyRent, Colors.blue.shade800),
                   ),
                   Positioned(
                     top: 10,
                     right: 10,
-                    child: _badge(item.Typeofproperty, Colors.black.withOpacity(0.7)),
+                    child: _badge(item.typeOfProperty, Colors.black.withOpacity(0.7)),
                   ),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _nestedSpecCard(Icons.bed, "${item.Bhk_Squarefit}"),
-                  _nestedSpecCard(Icons.bathtub, "${item.Baathroom} Bath"),
-                  _nestedSpecCard(Icons.square_foot, "900 Ft"),
-                ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _nestedSpecCard(Icons.bed, "${item.bhk}"),
+                    const SizedBox(width: 8),
+                    _nestedSpecCard(Icons.bathtub, "${item.bathroom}"),
+                    const SizedBox(width: 8),
+                    _nestedSpecCard(Icons.layers, "${item.squarefit} ft"),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -760,7 +780,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            item.Place_,
+                            item.locations,
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -769,7 +789,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                             ),
                           ),
                           Text(
-                            "New Delhi 110030",
+                            "New Delhi",
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey.shade600,
@@ -795,11 +815,11 @@ class _FilterPropertyState extends State<FilterProperty> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Row(
           children: [
             Icon(icon, size: 16, color: Colors.black87),
-            const SizedBox(width: 6),
+            const SizedBox(width: 3),
             Text(label, style: const TextStyle(fontSize: 13, color: Colors.black, fontFamily: 'Poppins')),
           ],
         ),

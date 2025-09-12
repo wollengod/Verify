@@ -1,135 +1,151 @@
-
-class FilterModel {
-  final int id;
-  final String Realstate_image;
-  final String Property_Number;
-  final String Address_;
-  final String Place_;
-  final String Price;
-  final String maintenance;
-  final String Buy_Rent;
-  final String Residence_Commercial;
-  final String floor_;
-  final String flat_;
-  final String date_;
-  final String Looking_Property_;
-  final String Typeofproperty;
-  final String Bhk_Squarefit;
-  final String Furnished;
-  final String Details;
-  final String Ownername;
-  final String Owner_number;
-  final String fieldworkarname;
-  final String fieldworkarnumber;
-  final String Building_information;
-  final String Parking;
-  final String Lift;
-  final String Security_guard;
-  final String Goverment_meter;
-  final String CCTV;
-  final String District;
-  final String Police_Station;
-  final String Pin_Code;
+class FilterPropertyModel {
+  final int pId;
+  final String propertyPhoto;
+  final String locations;
+  final String flatNumber;
+  final String buyRent;
+  final String residenceCommercial;
+  final String apartmentName;
+  final String apartmentAddress;
+  final String typeOfProperty;
+  final String bhk;
+  final String showPrice;
+  final String lastPrice;
+  final String askingPrice;
+  final String floor;
+  final String totalFloor;
   final String balcony;
+  final String squarefit;
+  final String maintance;
+  final String parking;
+  final String ageOfProperty;
+  final String fieldworkarAddress;
+  final String roadSize;
+  final String metroDistance;
+  final String highwayDistance;
+  final String mainMarketDistance;
+  final String meter;
+  final String ownerName;
+  final String ownerNumber;
+  final String currentDates;
+  final String availableDate;
   final String kitchen;
-  final String Baathroom;
-  final String Wifi;
-  final String Waterfilter;
-  final String Gas_meter;
-  final String Water_geyser;
-  final String Longtitude;
-  final String Latitude;
-  final String Address_apnehisaabka;
-  final String CareTaker_number;
+  final String bathroom;
+  final String lift;
+  final String facility;
+  final String furnishedUnfurnished;
+  final String fieldWorkerName;
+  final String liveUnlive;
+  final String fieldWorkerNumber;
+  final String registryAndGpa;
+  final String loan;
+  final String longitude;
+  final String latitude;
+  final String videoLink;
+  final String fieldWorkerCurrentLocation;
+  final String careTakerName;
+  final String careTakerNumber;
+  final int subId;
 
-  FilterModel({
-    required this.id,
-    required this.Realstate_image,
-    required this.Property_Number,
-    required this.Address_,
-    required this.Place_,
-    required this.Price,
-    required this.maintenance,
-    required this.Buy_Rent,
-    required this.Residence_Commercial,
-    required this.floor_,
-    required this.flat_,
-    required this.date_,
-    required this.Looking_Property_,
-    required this.Typeofproperty,
-    required this.Bhk_Squarefit,
-    required this.Furnished,
-    required this.Details,
-    required this.Ownername,
-    required this.Owner_number,
-    required this.fieldworkarname,
-    required this.fieldworkarnumber,
-    required this.Building_information,
-    required this.Parking,
-    required this.Lift,
-    required this.Security_guard,
-    required this.Goverment_meter,
-    required this.CCTV,
-    required this.District,
-    required this.Police_Station,
-    required this.Pin_Code,
+  FilterPropertyModel({
+    required this.pId,
+    required this.propertyPhoto,
+    required this.locations,
+    required this.flatNumber,
+    required this.buyRent,
+    required this.residenceCommercial,
+    required this.apartmentName,
+    required this.apartmentAddress,
+    required this.typeOfProperty,
+    required this.bhk,
+    required this.showPrice,
+    required this.lastPrice,
+    required this.askingPrice,
+    required this.floor,
+    required this.totalFloor,
     required this.balcony,
+    required this.squarefit,
+    required this.maintance,
+    required this.parking,
+    required this.ageOfProperty,
+    required this.fieldworkarAddress,
+    required this.roadSize,
+    required this.metroDistance,
+    required this.highwayDistance,
+    required this.mainMarketDistance,
+    required this.meter,
+    required this.ownerName,
+    required this.ownerNumber,
+    required this.currentDates,
+    required this.availableDate,
     required this.kitchen,
-    required this.Baathroom,
-    required this.Wifi,
-    required this.Waterfilter,
-    required this.Gas_meter,
-    required this.Water_geyser,
-    required this.Longtitude,
-    required this.Latitude,
-    required this.Address_apnehisaabka,
-    required this.CareTaker_number,
+    required this.bathroom,
+    required this.lift,
+    required this.facility,
+    required this.furnishedUnfurnished,
+    required this.fieldWorkerName,
+    required this.liveUnlive,
+    required this.fieldWorkerNumber,
+    required this.registryAndGpa,
+    required this.loan,
+    required this.longitude,
+    required this.latitude,
+    required this.videoLink,
+    required this.fieldWorkerCurrentLocation,
+    required this.careTakerName,
+    required this.careTakerNumber,
+    required this.subId,
   });
 
-  factory FilterModel.fromJson(Map<String, dynamic> json) {
-    return FilterModel(
-      id: int.tryParse(json['PVR_id'].toString()) ?? 0,
-      Realstate_image: json['Realstate_image'] ?? '',
-      Property_Number: json['Property_Number'] ?? '',
-      Address_: json['Address_'] ?? '',
-      Place_: json['Place_'] ?? '',
-      Price: json['Price'] ?? '',
-      maintenance: json['maintenance'] ?? '',
-      Buy_Rent: json['Buy_Rent'] ?? '',
-      Residence_Commercial: json['Residence_Commercial'] ?? '',
-      floor_: json['floor_'] ?? '',
-      flat_: json['flat_'] ?? '',
-      date_: json['date_'] ?? '',
-      Looking_Property_: json['Looking_Property_'] ?? '',
-      Typeofproperty: json['Typeofproperty'] ?? '',
-      Bhk_Squarefit: json['Bhk_Squarefit'] ?? '',
-      Furnished: json['Furnished'] ?? '',
-      Details: json['Details'] ?? '',
-      Ownername: json['Ownername'] ?? '',
-      Owner_number: json['Owner_number'] ?? '',
-      fieldworkarname: json['fieldworkarname'] ?? '',
-      fieldworkarnumber: json['fieldworkarnumber'] ?? '',
-      Building_information: json['Building_information'] ?? '',
-      Parking: json['Parking'] ?? '',
-      Lift: json['Lift'] ?? '',
-      Security_guard: json['Security_guard'] ?? '',
-      Goverment_meter: json['Goverment_meter'] ?? '',
-      CCTV: json['CCTV'] ?? '',
-      District: json['District'] ?? '',
-      Police_Station: json['Police_Station'] ?? '',
-      Pin_Code: json['Pin_Code'] ?? '',
-      balcony: json['balcony'] ?? '',
+  factory FilterPropertyModel.fromJson(Map<String, dynamic> json) {
+    return FilterPropertyModel(
+      pId: json['P_id'] ?? '',
+      propertyPhoto: json['property_photo'] ?? '',
+      locations: json['locations'] ?? '',
+      flatNumber: json['Flat_number'] ?? '',
+      buyRent: json['Buy_Rent'] ?? '',
+      residenceCommercial: json['Residence_Commercial'] ?? '',
+      apartmentName: json['Apartment_name'] ?? '',
+      apartmentAddress: json['Apartment_Address'] ?? '',
+      typeOfProperty: json['Typeofproperty'] ?? '',
+      bhk: json['Bhk'] ?? '',
+      showPrice: json['show_Price'] ?? '',
+      lastPrice: json['Last_Price'] ?? '',
+      askingPrice: json['asking_price'] ?? '',
+      floor: json['Floor_'] ?? '',
+      totalFloor: json['Total_floor'] ?? '',
+      balcony: json['Balcony'] ?? '',
+      squarefit: json['squarefit'] ?? '',
+      maintance: json['maintance'] ?? '',
+      parking: json['parking'] ?? '',
+      ageOfProperty: json['age_of_property'] ?? '',
+      fieldworkarAddress: json['fieldworkar_address'] ?? '',
+      roadSize: json['Road_Size'] ?? '',
+      metroDistance: json['metro_distance'] ?? '',
+      highwayDistance: json['highway_distance'] ?? '',
+      mainMarketDistance: json['main_market_distance'] ?? '',
+      meter: json['meter'] ?? '',
+      ownerName: json['owner_name'] ?? '',
+      ownerNumber: json['owner_number'] ?? '',
+      currentDates: json['current_dates'] ?? '',
+      availableDate: json['available_date'] ?? '',
       kitchen: json['kitchen'] ?? '',
-      Baathroom: json['Baathroom'] ?? '',
-      Wifi: json['wifi'] ?? '',
-      Waterfilter: json['Waterfilter'] ?? '',
-      Gas_meter: json['Gas_meter'] ?? '',
-      Water_geyser: json['Water_geyser'] ?? '',
-      Longtitude: json['Longtitude'] ?? '',
-      Latitude: json['Latitude'] ?? '',
-      Address_apnehisaabka: json['Address_apnehisaabka'] ?? '',
-      CareTaker_number: json['CareTaker_number'] ?? '',
+      bathroom: json['bathroom'] ?? '',
+      lift: json['lift'] ?? '',
+      facility: json['Facility'] ?? '',
+      furnishedUnfurnished: json['furnished_unfurnished'] ?? '',
+      fieldWorkerName: json['field_warkar_name'] ?? '',
+      liveUnlive: json['live_unlive'] ?? '',
+      fieldWorkerNumber: json['field_workar_number'] ?? '',
+      registryAndGpa: json['registry_and_gpa'] ?? '',
+      loan: json['loan'] ?? '',
+      longitude: json['Longitude'] ?? '',
+      latitude: json['Latitude'] ?? '',
+      videoLink: json['video_link'] ?? '',
+      fieldWorkerCurrentLocation: json['field_worker_current_location'] ?? '',
+      careTakerName: json['care_taker_name'] ?? '',
+      careTakerNumber: json['care_taker_number'] ?? '',
+      subId: json['subid'] ?? '',
     );
   }
-
 }

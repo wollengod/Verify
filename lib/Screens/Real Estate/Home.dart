@@ -97,57 +97,61 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     child: Column(
                       children: [
                         Container(
-                          margin: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(5),
                           child: NeumorphicSearchBar(HintText: 'Search Here'),
                         ),
                         SizedBox(
                           height: 120,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: categories.length,
-                            itemBuilder: (context, index) {
-                              final item = categories[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => item['page']),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.all(6.0),
-                                        width: 100,
-                                        decoration: BoxDecoration(
-                                          color: "#E3EFFF".toColor(),
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        padding: const EdgeInsets.all(8),
-                                        child: Image.asset(item['image'], height: 40, width: 40),
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.all(6.0),
-                                        child: Text(
-                                          item['title'],
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: "#E3EFFF".toColor(),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final itemWidth = constraints.maxWidth / 3; // divide screen width into 3
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: categories.map((item) {
+                                  return SizedBox(
+                                    width: itemWidth - 20, // small spacing adjustment
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => item['page']),
+                                        );
+                                      },
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.all(6.0),
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              color: "#E3EFFF".toColor(),
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            padding: const EdgeInsets.all(8),
+                                            child: Image.asset(item['image'], height: 40, width: 40),
                                           ),
-                                        ),
+                                          Container(
+                                            margin: const EdgeInsets.all(6.0),
+                                            child: Text(
+                                              item['title'],
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: "#E3EFFF".toColor(),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                }).toList(),
                               );
                             },
                           ),
                         ),
+
                       ],
                     ),
                   ),
@@ -156,35 +160,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               SliverPersistentHeader(
                 pinned: true,
                 delegate: _TabBarDelegate(
-                  TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    indicatorColor: Colors.blue.shade800,
-                    indicatorWeight: 3,
-                    labelColor: Colors.blue.shade800,
-                    unselectedLabelColor: Colors.black,
-                    labelStyle: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins',
-                    ),
-                    padding: const EdgeInsets.only(left: 30),
-                    labelPadding: const EdgeInsets.only(right: 40),
-                    tabs: propertyTypes.map((item) {
-                      return Tab(
-                        icon: Icon(item['icon'], size: 18),
-                        text: item['label'],
-                      );
-                    }).toList(),
-                    onTap: (index) {
-                      setState(() {
-                        selectedType = propertyTypes[index]['label'];
-                      });
-                    },
-                  ),
+                  _tabController,
+                  propertyTypes,
+                      (index) {
+                    setState(() {
+                      selectedType = propertyTypes[index]['label'];
+                    });
+                  },
                 ),
               ),
+
             ],
             body: RefreshIndicator(
               onRefresh: _onRefresh,
@@ -218,22 +203,56 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 }
 
 class _TabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar tabBar;
-  _TabBarDelegate(this.tabBar);
+  final TabController controller;
+  final List<Map<String, dynamic>> propertyTypes;
+  final Function(int) onTap;
+
+  _TabBarDelegate(this.controller, this.propertyTypes, this.onTap);
+
   @override
-  double get minExtent => tabBar.preferredSize.height;
+  double get minExtent => kToolbarHeight;
   @override
-  double get maxExtent => tabBar.preferredSize.height;
+  double get maxExtent => kToolbarHeight;
+
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
       color: Colors.grey.shade100,
-      child: tabBar,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          bool isWide = constraints.maxWidth > 600; // landscape / tablet
+          return
+            TabBar(
+            controller: controller,
+            isScrollable: !isWide, // ✅ if wide, spread equally
+            indicatorColor: Colors.blue.shade800,
+            indicatorWeight: 3,
+            labelColor: Colors.blue.shade800,
+            unselectedLabelColor: Colors.black,
+            labelStyle: TextStyle(
+              fontSize: isWide ? 11 : 13, // ✅ smaller font on wide screens
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Poppins',
+            ),
+            labelPadding: EdgeInsets.only(right: isWide ? 0 : 36),
+            tabs: propertyTypes.map((item) {
+              return Tab(
+                icon: Icon(
+                  item['icon'],
+                  size: isWide ? 16 : 18,
+                ),
+                text: item['label'],
+              );
+            }).toList(),
+            onTap: onTap,
+          );
+        },
+      ),
     );
   }
 
   @override
-  bool shouldRebuild(_TabBarDelegate oldDelegate) => false;
+  bool shouldRebuild(_TabBarDelegate oldDelegate) => true;
 }
 
 class BottomLeftCurveClipper extends CustomClipper<Path> {

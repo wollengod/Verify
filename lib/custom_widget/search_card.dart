@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:verify/model/search_model.dart';
 import 'package:verify/utilities/hex_color.dart';
 import '../../Screens/Real Estate/Sub_Srceen/full property.dart';
+import '../model/filter_model.dart';
 
 class SearchPropertyCard extends StatelessWidget {
-  final SearchModel item;
+  final FilterPropertyModel item;
 
   const SearchPropertyCard({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
-    String displayPrice = item.propertyNumber.trim();
+    String displayPrice = item.showPrice.trim();
     String? numericOnly = displayPrice.replaceAll(RegExp(r'[^\d]'), '');
     bool isPureNumber = RegExp(r'^\d+$').hasMatch(displayPrice);
 
@@ -24,7 +24,7 @@ class SearchPropertyCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('id_Building', int.parse(item.pvrId));
+        prefs.setInt('id_Building', item.pId);
         prefs.setString('id_Longitude', item.longitude);
         prefs.setString('id_Latitude', item.latitude);
         Navigator.push(context, MaterialPageRoute(builder: (_) => const Full_Property()));
@@ -43,12 +43,14 @@ class SearchPropertyCard extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Image.network(
-                        "https://verifyserve.social/${item.realstateImage}",
+                        "https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           height: 160,
+                          width: double.infinity,
+
                           color: Colors.grey.shade200,
                           child: const Icon(Icons.image_not_supported, size: 40),
                         ),
@@ -65,11 +67,18 @@ class SearchPropertyCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
                 children: [
-                  Expanded(child: _nestedSpecCard(Icons.meeting_room, "${item.bhkSquarefit}")),
+                  Expanded(child: _nestedSpecCard(Icons.bed, "${item.bhk}")),
                   const SizedBox(width: 6),
                   Expanded(child: _nestedSpecCard(Icons.bathtub, item.bathroom)),
                   const SizedBox(width: 6),
-                  Expanded(child: _nestedSpecCard(Icons.square_foot, "900")),
+                  Expanded(
+                    child: _nestedSpecCard(
+                      Icons.layers,
+                      item.squarefit != null && item.squarefit.isNotEmpty
+                          ? "${item.squarefit} ft"
+                          : "Com. Space",
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -104,7 +113,7 @@ class SearchPropertyCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item.place.isNotEmpty ? item.place : "Unknown",
+                              item.locations.isNotEmpty ? item.locations : "Unknown",
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -114,7 +123,7 @@ class SearchPropertyCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              "New Delhi 110030",
+                              "New Delhi",
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey.shade600,

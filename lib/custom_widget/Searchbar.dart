@@ -115,91 +115,95 @@ class _NeumorphicSearchBarState extends State<NeumorphicSearchBar>
       colors: [Color(0xFF00F0FF), Color(0xFF002AFF)],
     );
 
-    return Center(
-      child: Container(
-
-        height: 55,
-        width: 350,
-        decoration: BoxDecoration(
-          gradient: neonGradient,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF00F0FF).withOpacity(0.4),
-              blurRadius: 6,
-              spreadRadius: 0,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Center(
+          child: Container(
+            height: 55,
+            width: constraints.maxWidth * 0.9, // takes 90% of available width
+            decoration: BoxDecoration(
+              gradient: neonGradient,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF00F0FF).withOpacity(0.4),
+                  blurRadius: 6,
+                  spreadRadius: 0,
+                ),
+              ],
             ),
-          ],
-        ),
-        padding: const EdgeInsets.all(2),
-        child: Container(
-          decoration: BoxDecoration(
-            color: darkBoxColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: [
-              const SizedBox(width: 24),
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  style: const TextStyle(fontSize: 16, color: Colors.white),
-                  cursorColor: Colors.cyanAccent,
-                  decoration: InputDecoration(
-                    hintText: widget.HintText,
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    border: InputBorder.none,
-                    suffixIcon: _controller.text.isNotEmpty
-                        ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.white70),
-                      onPressed: () {
-                        setState(() {
-                          _controller.clear();
-                          _searchText = '';
-                        });
+            padding: const EdgeInsets.all(2),
+            child: Container(
+              decoration: BoxDecoration(
+                color: darkBoxColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                      cursorColor: Colors.cyanAccent,
+                      decoration: InputDecoration(
+                        hintText: widget.HintText,
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        border: InputBorder.none,
+                        suffixIcon: _controller.text.isNotEmpty
+                            ? IconButton(
+                          icon: const Icon(Icons.clear, color: Colors.white70),
+                          onPressed: () {
+                            setState(() {
+                              _controller.clear();
+                              _searchText = '';
+                            });
+                          },
+                        )
+                            : null,
+                      ),
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty) {
+                          _navigateToResult(value.trim());
+                        }
                       },
-                    )
-                        : null,
+                    ),
                   ),
-                  onSubmitted: (value) {
-                    if (value.trim().isNotEmpty) {
-                      _navigateToResult(value.trim());
-                    }
-                  },
-                ),
-              ),
-              GestureDetector(
-                onTap: _listen,
-                child: Transform.scale(
-                  scale: _isListening ? _animationController.value : 1.0,
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 6),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: _isListening ? Colors.redAccent : Colors.blue,
-                      shape: BoxShape.circle,
-                      boxShadow: _isListening
-                          ? [
-                        BoxShadow(
-                          color: Colors.redAccent.withOpacity(0.6),
-                          blurRadius: 20,
-                          spreadRadius: 1,
+                  GestureDetector(
+                    onTap: _listen,
+                    child: Transform.scale(
+                      scale: _isListening ? _animationController.value : 1.0,
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 6),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _isListening ? Colors.redAccent : Colors.blue,
+                          shape: BoxShape.circle,
+                          boxShadow: _isListening
+                              ? [
+                            BoxShadow(
+                              color: Colors.redAccent.withOpacity(0.6),
+                              blurRadius: 20,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
                         ),
-                      ]
-                          : [],
-                    ),
-                    child: Icon(
-                      _isListening ? Icons.mic_off : Icons.mic_none,
-                      size: 20,
-                      color: Colors.white,
+                        child: Icon(
+                          _isListening ? Icons.mic_off : Icons.mic_none,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
+
 }

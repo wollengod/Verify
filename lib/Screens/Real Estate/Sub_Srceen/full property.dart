@@ -70,6 +70,7 @@ class _Full_PropertyState extends State<Full_Property> {
   Future<List<RealEstateSlider>> fetchSlider(String? id) async {
     final response = await http.get(Uri.parse(
         "https://verifyserve.social/Second%20PHP%20FILE/main_realestate_for_website/show_multiple_image_in_main_realestate.php?subid=$id"));
+    print("Slider Id: ${id}");
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
@@ -198,10 +199,15 @@ class _Full_PropertyState extends State<Full_Property> {
                           if (sliderSnap.hasError) {
                             return Center(child: Text("Error loading images"));
                           }
-                          final slider_data = sliderSnap.data!.first; // safe now
-                          return buildImageCarousel(slider_data, sliderSnap.data ?? []);
+                          final sliders = sliderSnap.data ?? [];
+                          if (sliders.isEmpty) {
+                            return const SizedBox(); // completely hide if no images
+
+                          }
+                          return buildImageCarousel(sliders);
                         },
                       ),
+
                       const SizedBox(height: 5),
                       buildTitleLocation(data),
                       const SizedBox(height: 10),
@@ -209,7 +215,8 @@ class _Full_PropertyState extends State<Full_Property> {
                       const SizedBox(height: 20),
                       buildDetailsGrid(data),
                       const SizedBox(height: 20),
-                      buildStaticInfoSection(data.floor,data.ageOfProperty,data.totalFloor,"${data.location} Metro"),
+                      buildStaticInfoSection(data.floor,data.ageOfProperty,data.totalFloor,"${data.metroDistance} Metro",data.highwayDistance,data.roadSize,data.mainMarketDistance),
+                      //metro dist = name and highway dis = metro dis.
                       const SizedBox(height: 20),
                       Text(
                         "Available Facilities",
@@ -323,7 +330,7 @@ class _Full_PropertyState extends State<Full_Property> {
     );
   }
 
-  Widget buildImageCarousel(RealEstateSlider data, List<RealEstateSlider> sliders) {
+  Widget buildImageCarousel(List<RealEstateSlider> sliders) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -378,12 +385,27 @@ class _Full_PropertyState extends State<Full_Property> {
     );
   }
 
-  Widget buildStaticInfoSection(String floor,String Age,String total_floor,metro) {
+  Widget buildStaticInfoSection(String floor,String Age,String total_floor,metro,metro_distance,road,market_distance) {
     final List<Map<String, dynamic>> infoList = [
       {
         'icon': Icons.train,
         'title': 'Nearest Metro',
         'value': metro,
+      },
+      {
+        'icon': Icons.directions_walk,
+        'title': 'Metro Distance',
+        'value': metro_distance,
+      },
+      {
+        'icon': Icons.location_city,
+        'title': 'Market Distance',
+        'value': market_distance,
+      },
+      {
+        'icon': Icons.double_arrow,
+        'title': 'Road Size',
+        'value': road,
       },
       {
         'icon': Icons.home_work_outlined,
@@ -493,7 +515,13 @@ class _Full_PropertyState extends State<Full_Property> {
         statTile(Icons.bed, data.bhk, 'Bed'),
         statTile(Icons.bathtub, data.bathroom, 'Bath'),
         statTile(Icons.house, data.residenceCommercial, 'Property'),
-        statTile(Icons.flip_to_front_outlined, data.squarefit, 'Sqft'),
+        statTile(
+          Icons.flip_to_front_outlined,
+          (data.squarefit != null && data.squarefit.isNotEmpty) ? "${data.squarefit} Sqft" : "Comm. Space",
+          'Sqft',
+        ),
+
+
       ],
     );
   }

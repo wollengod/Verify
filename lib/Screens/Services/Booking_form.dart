@@ -151,7 +151,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
       'user_ids': userID,
       'user_names': userName,
       'email': email,
-      'user_number': userNumber,
+      'user_number': userNumber ?? '8851988930',
       'services_id': widget.serviceID,
       'service_names': widget.serviceName,
       'suitable_day': selectedDate!,
@@ -159,13 +159,14 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
       'address_for_services': locationController.text.trim(),
     }
     );
+    print(request.fields);
 
     setState(() => isLoading = true);
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-      print("➡️ BODY: $response");  // debug
+      print("➡️ BODY: ${response.body}");  // debug
       if (response.statusCode == 200 && response.body.contains("success")) {
         showSnack("✅ Service booked successfully!");
         Navigator.pop(context);

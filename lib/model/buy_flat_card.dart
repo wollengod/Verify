@@ -69,7 +69,7 @@ class BuyFlatCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(child: _nestedSpecCard(Icons.bathtub, item.bathroom)),
                   const SizedBox(width: 6),
-                  Expanded(child: _nestedSpecCard(Icons.square_foot, "900 Ft")),
+                  Expanded(child: _nestedSpecCard(Icons.square_foot, "${item.squarefit} ft")),
                 ],
               ),
             ),

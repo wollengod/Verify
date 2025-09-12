@@ -77,7 +77,14 @@ class PropertyCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(child: _nestedSpecCard(Icons.bathtub, item.bathroom)),
                   const SizedBox(width: 6),
-                  Expanded(child: _nestedSpecCard(Icons.square_foot, "2000 Ft")),
+                  Expanded(
+                    child: _nestedSpecCard(
+                      Icons.layers,
+                      item.squarefit != null && item.squarefit.isNotEmpty
+                          ? "${item.squarefit} ft"
+                          : "Com. Space",
+                    ),
+                  ),
                 ],
               ),
             ),
