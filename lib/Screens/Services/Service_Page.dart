@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 import 'package:verify/utilities/hex_color.dart';
-import '../../Themes/theme-helper.dart';
 import '../../custom_widget/Paths.dart';
 import '../../custom_widget/back_button.dart';
 import '../../model/service_model.dart';
@@ -26,7 +25,7 @@ class _ServicePageState extends State<ServicePage> {
   }
 
   Future<List<ServiceModel>> fetchServices() async {
-    final url = Uri.parse("https://verifyserve.social/WebService1.asmx/ShowServiceCat");
+    final url = Uri.parse("https://verifyserve.social/Second%20PHP%20FILE/main_application/display_services_data.php");
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -36,6 +35,7 @@ class _ServicePageState extends State<ServicePage> {
       throw Exception("Failed to load services");
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +124,7 @@ class _ServicePageState extends State<ServicePage> {
           context,
           MaterialPageRoute(
             builder: (context) => ServiceBookingPage(
-              serviceID: service.id.toString(),
+              serviceID: service.id,
               serviceName: service.name,
             ),
           ),
@@ -149,7 +149,7 @@ class _ServicePageState extends State<ServicePage> {
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 child: Image.network(
-                  "https://verifyserve.social/upload/${service.image}",
+                  "https://verifyserve.social/Second%20PHP%20FILE/main_application/${service.image}",
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) =>

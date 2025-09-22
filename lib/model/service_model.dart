@@ -1,5 +1,5 @@
 class ServiceModel {
-  final int id;
+  final String id;
   final String name;
   final String image;
 
@@ -8,8 +8,8 @@ class ServiceModel {
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
       id: json['id'],
-      name: json['scname'],
-      image: json['scimg'],
+      name: json['s_name'],
+      image: json['s_img'],
     );
   }
 }
