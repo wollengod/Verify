@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:verify/utilities/hex_color.dart';
+import 'package:swaven/utilities/hex_color.dart';
 import '../../Screens/Real Estate/Sub_Srceen/full property.dart';
 import '../model/filter_model.dart';
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "827405616145",
+    "project_id": "the-verify-3ad1c",
+    "storage_bucket": "the-verify-3ad1c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:827405616145:android:8f611fe240336274881db0",
+        "android_client_info": {
+          "package_name": "com.swaven.verify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClPGpKJarIzQlaq_9QKAt4A1eOqpLfs3Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

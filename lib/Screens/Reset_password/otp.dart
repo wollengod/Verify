@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
-import 'package:verify/utilities/hex_color.dart';
+import 'package:swaven/utilities/hex_color.dart';
 
 import 'changing_pass.dart';
 class Otp extends StatefulWidget {

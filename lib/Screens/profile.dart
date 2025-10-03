@@ -6,8 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:verify/Screens/Loginpage.dart';
-import 'package:verify/custom_widget/Paths.dart';
+import 'package:swaven/Screens/Loginpage.dart';
+import 'package:swaven/custom_widget/Paths.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});

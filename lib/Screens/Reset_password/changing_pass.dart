@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:verify/Screens/Loginpage.dart';
+import 'package:swaven/Screens/Loginpage.dart';
 
 import '../../custom_widget/Paths.dart';
 

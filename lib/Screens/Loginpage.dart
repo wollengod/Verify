@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:verify/Themes/theme-helper.dart';
-import 'package:verify/custom_widget/Paths.dart';
-import 'package:verify/utilities/hex_color.dart';
+import 'package:swaven/Themes/theme-helper.dart';
+import 'package:swaven/custom_widget/Paths.dart';
+import 'package:swaven/utilities/hex_color.dart';
 import 'Real Estate/Homepage.dart';
 import 'Reset_password/forget.dart';
 import 'SignUp.dart';
@@ -46,14 +46,11 @@ class _LoginPageState extends State<LoginPage> {
       final String emailFromAPI = data['user']['Email'];       // fixed casing
       final int IDFromAPI = data['user']['id'];                // already an int
       final String mobileFromAPI = data['user']['Mobile'];
-      //final String profileFromAPI = data['user']['profile'];
-      //Login saved here.
       var shared_pref= await SharedPreferences.getInstance();
       await shared_pref.setBool(SplashScreenState.KEY_LOGIN, true);
       await shared_pref.setString('name', fullNameFromAPI);
       await shared_pref.setString('email', emailFromAPI);
       await shared_pref.setString('number', mobileFromAPI);
-      //await shared_pref.setString('profile', profileFromAPI);
       await shared_pref.setInt('id', IDFromAPI);
 
       //profile(fullNameFromAPI,emailFromAPI,IDFromAPI);

@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:verify/utilities/hex_color.dart';
+import 'package:swaven/utilities/hex_color.dart';
 import '../../Themes/theme-helper.dart';
 import '../../custom_widget/Paths.dart';
 import '../../custom_widget/back_button.dart';

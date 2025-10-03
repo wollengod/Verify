@@ -1,11 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:verify/utilities/hex_color.dart';
+import 'package:swaven/utilities/hex_color.dart';
 import '../../../../custom_widget/property_card.dart';
 import '../../../../model/Office_model.dart';
-import '../full property.dart';
 
 class FarmhousePropertyPage extends StatefulWidget {
   const FarmhousePropertyPage({super.key});
@@ -73,7 +71,14 @@ class _FarmhousePropertyPageState extends State<FarmhousePropertyPage> {
               final data = snapshot.data;
 
               if (data == null || data.isEmpty) {
-                return const Center(child: Text("No Farmhouse properties found.",style: TextStyle(color: Colors.black),));
+                return const  Center(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 100,),
+                        Text("No Farmhouse properties found.",style: TextStyle(color: Colors.black)),
+                      ],
+                    )
+                );
               }
 
               return ListView.builder(

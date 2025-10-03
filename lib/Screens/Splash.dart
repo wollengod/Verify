@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:verify/custom_widget/Paths.dart';
-import 'package:verify/utilities/hex_color.dart';
+import 'package:swaven/custom_widget/Paths.dart';
+import 'package:swaven/utilities/hex_color.dart';
 import 'Real Estate/Homepage.dart';
 import 'Loginpage.dart';
 
@@ -38,7 +38,7 @@ class SplashScreenState extends State<SplashScreen> {
 
     //Provider.of<UserModel>(context, listen: false).updateUserData(name, email, userID);
 
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 250));
     if (!mounted) return;
 
     Navigator.pushReplacement(

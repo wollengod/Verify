@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:verify/utilities/hex_color.dart';
+import 'package:swaven/utilities/hex_color.dart';
 import '../../../../../custom_widget/property_card.dart';
 import '../../../../../model/Office_model.dart';
 

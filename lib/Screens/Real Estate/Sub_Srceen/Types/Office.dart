@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:verify/utilities/hex_color.dart';
+import 'package:swaven/utilities/hex_color.dart';
 import '../../../../custom_widget/property_card.dart';
 import '../../../../model/Office_model.dart';
 
@@ -29,7 +29,8 @@ class _OfficePropertyPageState extends State<OfficePropertyPage> {
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> data = jsonData['data']; // <--- access the list inside "data"
 
       // sort descending by P_id
       data.sort((a, b) => (b['P_id'] ?? '0').compareTo(a['P_id'] ?? '0'));
@@ -72,7 +73,14 @@ class _OfficePropertyPageState extends State<OfficePropertyPage> {
               final data = snapshot.data;
 
               if (data == null || data.isEmpty) {
-                return const Center(child: Text("No office properties found.",style: TextStyle(color: Colors.black)));
+                return const Center(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 100,),
+                        Text("No Office properties found.",style: TextStyle(color: Colors.black)),
+                      ],
+                    )
+                );
               }
 
               return ListView.builder(
