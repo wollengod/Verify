@@ -1,11 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:swaven/Screens/Splash.dart';
+import 'package:Verify/Screens/Splash.dart';
 import 'Themes/theme_provider.dart';
 
-// 🔥 Firebase imports
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+Future<void> initLocalNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings =
+  InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      onDidReceiveNotificationResponse: (details) {
+        print('📩 Notification tapped: ${details.payload}');
+        // You can navigate to a screen here if needed
+      });
+}
 
 // Handle background messages
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -18,6 +38,8 @@ void main() async {
 
   // Initialize Firebase
   await Firebase.initializeApp();
+  await initLocalNotifications();
+
 
   FirebaseMessaging.instance.subscribeToTopic("wollengod");
 
@@ -45,7 +67,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'swaven',
+      title: 'Verify',
       theme: ThemeData(
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
@@ -74,23 +96,41 @@ class MyApp extends StatelessWidget {
   }
 
   void _initFCM() {
-    // Request notification permission
+    // Request permission
     FirebaseMessaging.instance.requestPermission();
 
     // Get FCM token
     FirebaseMessaging.instance.getToken().then((token) {
-      print("📲 FCM Token: $token"); // Use this for sending test notifications
+      print("📲 FCM Token: $token");
     });
 
     // Foreground notifications
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print("🔔 Foreground message: ${message.notification?.title}");
+
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+
+      if (notification != null && android != null) {
+        await flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'default_channel',       // channel id
+              'Default',               // channel name
+              importance: Importance.max,
+              priority: Priority.high,
+            ),
+          ),
+        );
+      }
     });
 
     // When app opened by tapping notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print("📩 Notification clicked!");
-      // 👉 Navigate to a screen if needed
     });
   }
 }

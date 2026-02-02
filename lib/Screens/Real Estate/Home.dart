@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:swaven/utilities/hex_color.dart';
+import 'package:Verify/utilities/hex_color.dart';
 import '../../custom_widget/Searchbar.dart';
 import '../../model/Home_model.dart';
 import '../Insurace/Health.dart';

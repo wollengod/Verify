@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:swaven/utilities/hex_color.dart';
+import 'package:Verify/utilities/hex_color.dart';
 
 import '../../custom_widget/Paths.dart';
 import '../../custom_widget/back_button.dart';

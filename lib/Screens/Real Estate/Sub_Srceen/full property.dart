@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:swaven/Themes/theme-helper.dart';
-import 'package:swaven/utilities/hex_color.dart';
+import 'package:Verify/Themes/theme-helper.dart';
+import 'package:Verify/utilities/hex_color.dart';
 import '../../../custom_widget/Paths.dart';
 import '../../../custom_widget/Preview.dart';
 import '../../../custom_widget/back_button.dart';
@@ -100,7 +99,8 @@ class _Full_PropertyState extends State<Full_Property> {
     required String userName,
     required String phoneNumber,
     required String address, // user’s address or property address
-  }) async {
+  })
+  async {
     final url = Uri.parse(
         'https://verifyserve.social/Second%20PHP%20FILE/book_shedual/book_shedual.php');
 
@@ -131,8 +131,6 @@ class _Full_PropertyState extends State<Full_Property> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,7 +157,7 @@ class _Full_PropertyState extends State<Full_Property> {
             if (snapshot.hasError) {
               return Center(child: Row(
                 children: [
-                  Text("Error: ${snapshot.error}",style: TextStyle(color: AppColors.bgColor(context),fontSize: 13),),
+                  Text("Error: ${snapshot.error}",style: TextStyle(    fontFamily: 'Poppins',color: AppColors.bgColor(context),fontSize: 13),),
                 ],
               ));
             }
@@ -220,7 +218,8 @@ class _Full_PropertyState extends State<Full_Property> {
                       const SizedBox(height: 20),
                       Text(
                         "Available Facilities",
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
                           color: Colors.black,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -231,7 +230,8 @@ class _Full_PropertyState extends State<Full_Property> {
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           data.facility,
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
                             fontSize: 15,
                             color: Colors.black87,
                           ),
@@ -262,7 +262,8 @@ class _Full_PropertyState extends State<Full_Property> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('₹ ${data.showPrice}',
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
+                            fontFamily: 'Poppins',
                             fontSize: 20,
                             color: "#001234".toColor(),
                             fontWeight: FontWeight.bold)),
@@ -303,7 +304,8 @@ class _Full_PropertyState extends State<Full_Property> {
                       ),
                       child: Text(
                         "Book Schedule",
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
                           color: Colors.white, // Changed from grey to white for better contrast
                         ),
@@ -334,7 +336,6 @@ class _Full_PropertyState extends State<Full_Property> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         const SizedBox(height: 12),
         SizedBox(
           height: 70,
@@ -373,7 +374,8 @@ class _Full_PropertyState extends State<Full_Property> {
           children:[
             Text(
               "Total Images: ${sliders.length}",
-              style: GoogleFonts.poppins(
+              style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 14,
                 color: Colors.black54,
                 fontWeight: FontWeight.w500,
@@ -435,7 +437,8 @@ class _Full_PropertyState extends State<Full_Property> {
         const SizedBox(height: 16),
         Text(
           "Additional Information",
-          style: GoogleFonts.poppins(
+          style: TextStyle(
+            fontFamily: 'Poppins',
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Colors.black,
@@ -450,13 +453,13 @@ class _Full_PropertyState extends State<Full_Property> {
               const SizedBox(width: 10),
               Text(
                 "${item['title']}: ",
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w500,color: Colors.black,
+                style: TextStyle(    fontFamily: 'Poppins', fontWeight: FontWeight.w500,color: Colors.black,
                 ),
               ),
               Expanded(
                 child: Text(
                   item['value'],
-                  style: GoogleFonts.poppins(color: Colors.black87),
+                  style: TextStyle(    fontFamily: 'Poppins', color: Colors.black87),
                 ),
               )
             ],
@@ -475,13 +478,14 @@ class _Full_PropertyState extends State<Full_Property> {
         Row(
           children: [
             Text("${data.bhk} ${data.typeOfProperty} For ${data.buyRent} in ",
-                style: GoogleFonts.poppins(
+                style: TextStyle(
+                    fontFamily: 'Poppins',
                     fontSize: 20, fontWeight: FontWeight.w400,color: Colors.black87)),
           ],
         ),
         SizedBox(height: 2,),
         Text(data.location,
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600,
+            style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600,
                 fontSize: 20, color: Colors.blue.shade900)),
       ],
     );
@@ -502,7 +506,7 @@ class _Full_PropertyState extends State<Full_Property> {
   Widget chip(IconData icon, String label) {
     return Chip(
       avatar: Icon(icon, size: 18, color: Colors.black54),
-      label: Text(label, style: GoogleFonts.poppins(color: Colors.black)),
+      label: Text(label, style: TextStyle(fontFamily: 'Poppins', color: Colors.black)),
       backgroundColor: "#E3EFFF".toColor(),
       shape: const StadiumBorder(side: BorderSide(color: Colors.black12)),
     );
@@ -532,10 +536,12 @@ class _Full_PropertyState extends State<Full_Property> {
         Icon(icon, color: Colors.black),
         const SizedBox(height: 4),
         Text(value,
-            style: GoogleFonts.poppins(
+            style: TextStyle(
+                fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold, fontSize: 14,color: Colors.black)),
         Text(label,
-            style: GoogleFonts.poppins(
+            style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 12, color: Colors.grey.shade600)),
       ],
     );

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:swaven/model/Office_model.dart';
+import 'package:Verify/model/Office_model.dart';
 import 'package:intl/intl.dart';
-import 'package:swaven/utilities/hex_color.dart';
+import 'package:Verify/utilities/hex_color.dart';
 import '../Screens/Real Estate/Sub_Srceen/full property.dart';
 
 class PropertyCard extends StatelessWidget {

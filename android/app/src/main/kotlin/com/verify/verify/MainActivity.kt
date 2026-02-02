@@ -1,4 +1,4 @@
-package com.swaven.verify
+package com.Verify.verify
 
 import io.flutter.embedding.android.FlutterActivity
 

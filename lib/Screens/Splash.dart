@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:swaven/custom_widget/Paths.dart';
-import 'package:swaven/utilities/hex_color.dart';
+import 'package:Verify/custom_widget/Paths.dart';
+import 'package:Verify/utilities/hex_color.dart';
 import 'Real Estate/Homepage.dart';
 import 'Loginpage.dart';
 

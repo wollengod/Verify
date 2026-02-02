@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:swaven/Screens/Real%20Estate/Home.dart';
-import 'package:swaven/Screens/Real%20Estate/filter.dart';
-import 'package:swaven/Screens/profile.dart';
-import 'package:swaven/utilities/hex_color.dart';
+import 'package:Verify/Screens/Real%20Estate/Home.dart';
+import 'package:Verify/Screens/Real%20Estate/filter.dart';
+import 'package:Verify/Screens/profile.dart';
+import 'package:Verify/utilities/hex_color.dart';
 
 import '../../custom_widget/Paths.dart';
 

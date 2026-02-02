@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:swaven/utilities/hex_color.dart';
+import 'package:Verify/utilities/hex_color.dart';
 
 import '../Screens/Real Estate/search_result.dart';
 
