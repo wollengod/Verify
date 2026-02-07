@@ -7,6 +7,7 @@ import 'package:Verify/Themes/theme-helper.dart';
 import 'package:Verify/utilities/hex_color.dart';
 import '../../../custom_widget/Paths.dart';
 import '../../../custom_widget/Preview.dart';
+import '../../../custom_widget/Youtube_video.dart';
 import '../../../custom_widget/back_button.dart';
 import '../../../model/detailed_property_model.dart';
 import '../../../model/image_model.dart';
@@ -43,6 +44,7 @@ class _Full_PropertyState extends State<Full_Property> {
   }
 
   Future<List<DetailedPropertyModel>> fetchProperty(String? id) async {
+    print("Detail page Id: $id ");
     final response = await http.get(Uri.parse(
         "https://verifyserve.social/Second%20PHP%20FILE/main_application/details_page.php?P_id=$id"));
 
@@ -134,7 +136,7 @@ class _Full_PropertyState extends State<Full_Property> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: const Color(0xFFF4F7FB),
       //"#EEF5FF".toColor(),
       appBar: AppBar(
         leading: const CustomBackButton(),
@@ -175,17 +177,10 @@ class _Full_PropertyState extends State<Full_Property> {
                     padding: const EdgeInsets.all(16),
                     children: [
 
-                      Hero(
-                        tag: 'property-image-${data.id}',
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(
-                            'https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${data.propertyPhoto}',
-                            height: 220,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                      VideoPlayerWidget(
+                        videoUrl: data.videoLink,
+                        fallbackImageUrl:
+                        'https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${data.propertyPhoto}',
                       ),
 
                       FutureBuilder<List<RealEstateSlider>>(
@@ -213,7 +208,7 @@ class _Full_PropertyState extends State<Full_Property> {
                       const SizedBox(height: 20),
                       buildDetailsGrid(data),
                       const SizedBox(height: 20),
-                      buildStaticInfoSection(data.floor,data.ageOfProperty,data.totalFloor,"${data.metroDistance} Metro",data.highwayDistance,data.roadSize,data.mainMarketDistance),
+                      buildStaticInfoSection(data.floor,data.ageOfProperty,data.totalFloor,"${data.metroDistance} Metro",data.highwayDistance,data.roadSize,data.mainMarketDistance,data.id.toString()),
                       //metro dist = name and highway dis = metro dis.
                       const SizedBox(height: 20),
                       Text(
@@ -387,8 +382,13 @@ class _Full_PropertyState extends State<Full_Property> {
     );
   }
 
-  Widget buildStaticInfoSection(String floor,String Age,String total_floor,metro,metro_distance,road,market_distance) {
+  Widget buildStaticInfoSection(String floor,String Age,String total_floor,metro,metro_distance,road,market_distance,id) {
     final List<Map<String, dynamic>> infoList = [
+      {
+        'icon': Icons.add_card,
+        'title': 'ID',
+        'value': id,
+      },
       {
         'icon': Icons.train,
         'title': 'Nearest Metro',
@@ -468,7 +468,6 @@ class _Full_PropertyState extends State<Full_Property> {
       ],
     );
   }
-
 
   Widget buildTitleLocation(DetailedPropertyModel data) {
     return Column(

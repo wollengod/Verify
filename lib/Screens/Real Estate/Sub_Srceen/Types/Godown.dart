@@ -22,26 +22,32 @@ class _GodownPropertyPageState extends State<GodownPropertyPage> {
   }
 
   Future<List<OfficePropertyModel>> fetchOfficeProperties() async {
+    final userId = await getUserId();
+
     final url = Uri.parse(
-      "https://verifyserve.social/Second%20PHP%20FILE/main_application/Godown.php",
+      "https://verifyserve.social/Second%20PHP%20FILE/main_application/Godown.php?user_id=$userId",
     );
 
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonData = json.decode(response.body);
-      final List<dynamic> data = jsonData['data'] ?? [];
+      final decoded = json.decode(response.body);
+
+      // ✅ GODOWN API RETURNS LIST DIRECTLY
+      final List<dynamic> data = decoded is List ? decoded : [];
 
       // sort descending by P_id
-      data.sort((a, b) => (b['P_id'] ?? '0').compareTo(a['P_id'] ?? '0'));
+      data.sort((a, b) =>
+          int.parse(b['P_id']).compareTo(int.parse(a['P_id'])));
 
       return data
-          .map((item) => OfficePropertyModel.fromJson(item as Map<String, dynamic>))
+          .map((e) => OfficePropertyModel.fromJson(e))
           .toList();
     } else {
-      throw Exception('Failed to load office properties');
+      throw Exception('Failed to load godown properties');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;

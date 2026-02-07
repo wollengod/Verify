@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Verify/custom_widget/back_button.dart';
+import '../../custom_widget/property_card.dart';
 import '../../custom_widget/search_card.dart';
 import '../../model/filter_model.dart';
 import '../../model/search_model.dart';
@@ -27,7 +28,8 @@ class _SearchResultPageState extends State<SearchResultPage> {
   }
 
   Future<List<FilterPropertyModel>> fetchSearchResults(String keyword) async {
-    final url = Uri.parse("https://verifyserve.social/Second%20PHP%20FILE/search%20api/search.php");
+    final userId = await getUserId();
+    final url = Uri.parse("https://verifyserve.social/Second%20PHP%20FILE/search%20api/search.php?user_id=$userId");
 
     final response = await http.post(
       url,

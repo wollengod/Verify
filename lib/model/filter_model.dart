@@ -46,6 +46,7 @@ class FilterPropertyModel {
   final String careTakerName;
   final String careTakerNumber;
   final int subId;
+  final bool isWishListed;
 
   FilterPropertyModel({
     required this.pId,
@@ -95,6 +96,8 @@ class FilterPropertyModel {
     required this.careTakerName,
     required this.careTakerNumber,
     required this.subId,
+    required this.isWishListed,
+
   });
 
   factory FilterPropertyModel.fromJson(Map<String, dynamic> json) {
@@ -146,6 +149,7 @@ class FilterPropertyModel {
       careTakerName: json['care_taker_name'] ?? '',
       careTakerNumber: json['care_taker_number'] ?? '',
       subId: json['subid'] ?? '',
+      isWishListed: json['watchlist'] == '1',
     );
   }
 }

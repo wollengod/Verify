@@ -46,6 +46,7 @@ class OfficePropertyModel {
   final String careTakerName;
   final String careTakerNumber;
   final String subId;
+  final bool isWishListed;
 
   OfficePropertyModel({
     required this.pId,
@@ -95,9 +96,11 @@ class OfficePropertyModel {
     required this.careTakerName,
     required this.careTakerNumber,
     required this.subId,
+    required this.isWishListed,
   });
 
   factory OfficePropertyModel.fromJson(Map<String, dynamic> json) {
+
     return OfficePropertyModel(
       pId: json['P_id'] ?? '',
       propertyPhoto: json['property_photo'] ?? '',
@@ -146,6 +149,7 @@ class OfficePropertyModel {
       careTakerName: json['care_taker_name'] ?? '',
       careTakerNumber: json['care_taker_number'] ?? '',
       subId: json['subid'] ?? '',
+      isWishListed: json['is_wishlisted'] == '1',
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:Verify/custom_widget/wish_button.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Verify/model/Office_model.dart';
@@ -5,10 +6,17 @@ import 'package:intl/intl.dart';
 import 'package:Verify/utilities/hex_color.dart';
 import '../Screens/Real Estate/Sub_Srceen/full property.dart';
 
+Future<int?> getUserId() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('id');
+}
+
 class PropertyCard extends StatelessWidget {
   final OfficePropertyModel item;
+  final Widget? wishlistButton; // 👈 NEW
 
-  const PropertyCard({super.key, required this.item});
+
+  const PropertyCard({super.key, required this.item,this.wishlistButton,});
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +69,15 @@ class PropertyCard extends StatelessWidget {
                           child: const Icon(Icons.image_not_supported, size: 40),
                         ),
                       ),
+                    ),
+                    Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: wishlistButton ??
+                          WishlistButton(
+                            pId: int.parse(item.pId),
+                            initialState: item.isWishListed,
+                          ),
                     ),
                     Positioned(top: 10, left: 10, child: _badge(item.buyRent, Colors.blue.shade800)),
                     Positioned(top: 10, right: 10, child: _badge(item.typeOfProperty, Colors.black.withOpacity(0.7))),
@@ -130,7 +147,7 @@ class PropertyCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              "New Delhi 110030",
+                              "New Delhi",
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey.shade600,

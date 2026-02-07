@@ -21,8 +21,9 @@ class _FlatPropertyPageState extends State<FlatPropertyPage> {
   }
 
   Future<List<OfficePropertyModel>> fetchOfficeProperties() async {
+    final userId = await getUserId();
     final url = Uri.parse(
-      "https://verifyserve.social/Second%20PHP%20FILE/main_application/show_data_rent_property.php",
+      "https://verifyserve.social/Second%20PHP%20FILE/main_application/show_data_rent_property.php?user_id=$userId",
     );
 
     final response = await http.get(url);

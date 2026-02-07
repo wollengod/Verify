@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Verify/Screens/Real%20Estate/Homepage.dart';
+import 'package:Verify/Screens/Homepage.dart';
 import 'package:Verify/custom_widget/Paths.dart';
 import 'package:Verify/utilities/hex_color.dart';
 import '../custom_widget/back_button.dart';

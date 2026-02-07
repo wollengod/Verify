@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Verify/custom_widget/Paths.dart';
 import 'package:Verify/utilities/hex_color.dart';
-import 'Real Estate/Homepage.dart';
+import 'Homepage.dart';
 import 'Loginpage.dart';
 
 class SplashScreen extends StatefulWidget {

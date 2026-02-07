@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../../../../../custom_widget/property_card.dart';
 import '../../../../../model/Office_model.dart';
 import '../../../../../model/buy_flat_card.dart';
 
@@ -21,8 +22,9 @@ class _FlatPropertyBuyState extends State<FlatPropertyBuy> {
   }
 
   Future<List<OfficePropertyModel>> fetchOfficeProperties() async {
+    final userId = await getUserId();
     final url = Uri.parse(
-      "https://verifyserve.social/Second%20PHP%20FILE/main_application/show_data_for_sale_property.php",
+      "https://verifyserve.social/Second%20PHP%20FILE/main_application/show_data_for_sale_property.php?user_id=$userId",
     );
 
     final response = await http.get(url);
@@ -30,7 +32,6 @@ class _FlatPropertyBuyState extends State<FlatPropertyBuy> {
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
 
-      // sort descending by P_id
       data.sort((a, b) => (b['P_id'] ?? '0').compareTo(a['P_id'] ?? '0'));
 
       return data

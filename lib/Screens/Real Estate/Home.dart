@@ -15,6 +15,12 @@ import 'Sub_Srceen/Types/farmhouse.dart';
 import 'Sub_Srceen/Types/flat/flat tab.dart';
 import 'Sub_Srceen/Types/shop.dart';
 
+
+Future<int?> getUserId() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getInt('id');
+}
+
 class Home extends StatefulWidget {
   const Home({super.key});
   @override

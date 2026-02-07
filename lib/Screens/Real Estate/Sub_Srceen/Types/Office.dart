@@ -22,8 +22,9 @@ class _OfficePropertyPageState extends State<OfficePropertyPage> {
   }
 
   Future<List<OfficePropertyModel>> fetchOfficeProperties() async {
+    final userId = await getUserId();
     final url = Uri.parse(
-      "https://verifyserve.social/Second%20PHP%20FILE/main_application/office.php",
+      "https://verifyserve.social/Second%20PHP%20FILE/main_application/office.php?user_id=$userId",
     );
 
     final response = await http.get(url);

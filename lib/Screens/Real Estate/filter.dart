@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Verify/custom_widget/back_button.dart';
 import '../../custom_widget/Paths.dart';
+import '../../custom_widget/property_card.dart';
+import '../../custom_widget/wish_button.dart';
 import '../../model/Office_model.dart';
 import '../../model/filter_model.dart';
 import 'Sub_Srceen/full property.dart';
@@ -68,6 +70,7 @@ class _FilterPropertyState extends State<FilterProperty> {
   }
 
   Future<void> filterProperties() async {
+    final userId = await getUserId();
     setState(() {
       isFiltering = true;
       noResult = false;
@@ -76,7 +79,7 @@ class _FilterPropertyState extends State<FilterProperty> {
     // Build query string
     final uri = Uri.parse(
       "https://verifyserve.social/WebService4.asmx/filter_main_application"
-          "?Buy_Rent=$selectedBuyRent"
+          "?user_id=$userId,Buy_Rent=$selectedBuyRent"
           "&Bhk=$selectedBHK"
           "&Typeofproperty=$selectedProperty"
           "&locations=$selectedPlace",
@@ -600,6 +603,14 @@ class _FilterPropertyState extends State<FilterProperty> {
                     ),
                   ),
                   Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: WishlistButton(
+                      pId: int.parse(item.pId),
+                      initialState: item.isWishListed,
+                    ),
+                  ),
+                  Positioned(
                     top: 10,
                     left: 10,
                     child: _badge(item.buyRent, Colors.blue.shade800),
@@ -724,6 +735,14 @@ class _FilterPropertyState extends State<FilterProperty> {
                         color: Colors.grey.shade200,
                         child: const Icon(Icons.image_not_supported, size: 40),
                       ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: WishlistButton(
+                      pId: item.pId,
+                      initialState: item.isWishListed,
                     ),
                   ),
                   Positioned(

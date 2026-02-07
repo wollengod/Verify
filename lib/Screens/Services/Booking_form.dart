@@ -187,7 +187,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
     // final cardColor = Theme.of(context).cardColor;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
         title:
         Image.asset(AppImages.logo2, height: 70),

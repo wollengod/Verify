@@ -1,3 +1,4 @@
+import 'package:Verify/custom_widget/wish_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,6 +55,14 @@ class SearchPropertyCard extends StatelessWidget {
                           color: Colors.grey.shade200,
                           child: const Icon(Icons.image_not_supported, size: 40),
                         ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: WishlistButton(
+                        pId: item.pId,
+                        initialState: item.isWishListed,
                       ),
                     ),
                     Positioned(top: 10, left: 10, child: _badge(item.buyRent, Colors.blue.shade800)),

@@ -4,11 +4,14 @@ import 'package:Verify/model/Office_model.dart';
 import 'package:intl/intl.dart';
 import 'package:Verify/utilities/hex_color.dart';
 import '../../../Screens/Real Estate/Sub_Srceen/full property.dart';
+import '../custom_widget/wish_button.dart';
 
 class BuyFlatCard extends StatelessWidget {
   final OfficePropertyModel item;
+  final Widget? wishlistButton; // 👈 NEW
 
-  const BuyFlatCard({super.key, required this.item});
+
+  const BuyFlatCard({super.key, required this.item,this.wishlistButton,});
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +56,15 @@ class BuyFlatCard extends StatelessWidget {
                           child: const Icon(Icons.image_not_supported, size: 40),
                         ),
                       ),
+                    ),
+                    Positioned(
+                      bottom: 10,
+                      right: 10,
+                      child: wishlistButton ??
+                          WishlistButton(
+                            pId: int.parse(item.pId),
+                            initialState: item.isWishListed,
+                          ),
                     ),
                     Positioned(top: 10, left: 10, child: _badge(item.buyRent, Colors.yellow.shade800)),
                     Positioned(top: 10, right: 10, child: _badge(item.typeOfProperty, Colors.black.withOpacity(0.7))),
@@ -113,7 +125,7 @@ class BuyFlatCard extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "New Delhi 110030",
+                              "New Delhi",
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 13,

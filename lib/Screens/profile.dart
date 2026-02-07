@@ -9,6 +9,21 @@ import 'package:image_picker/image_picker.dart';
 import 'package:Verify/Screens/Loginpage.dart';
 import 'package:Verify/custom_widget/Paths.dart';
 
+import 'Real Estate/wishlist.dart';
+
+class SocialLink {
+  final String title;
+  final String assetPath;
+  final String url;
+
+  SocialLink({
+    required this.title,
+    required this.assetPath,
+    required this.url,
+  });
+}
+
+
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
@@ -24,6 +39,48 @@ class _ProfileState extends State<Profile> {
   File? _profileImage;
   final ImagePicker _picker = ImagePicker();
   String? _profileImageUrl;
+  bool showMoreSocialLinks = false;
+
+  final List<SocialLink> primarySocialLinks = [
+    SocialLink(
+      title: "Instagram",
+      assetPath: AppImages.instagram,
+      url: "https://www.instagram.com/verify_realestate_",
+    ),
+
+    SocialLink(
+      title: "Facebook",
+      assetPath: AppImages.facebook,
+      url: "https://www.facebook.com/profile.php?id=61573465167534",
+    ),
+
+    SocialLink(
+      title: "YouTube",
+      assetPath: AppImages.youtube,
+
+      url: "https://www.youtube.com/@Verify_Real_Estate",
+    ),
+  ];
+
+  final List<SocialLink> moreSocialLinks = [
+
+    SocialLink(
+      title: "WhatsApp",
+      assetPath: AppImages.whatsapp,
+      url: "https://wa.me/919711773800",
+    ),
+    SocialLink(
+      title: "Twitter",
+      assetPath: AppImages.x,
+      url: "https://x.com/swavenrealty",
+    ),
+    SocialLink(
+      title: "Snapchat",
+      assetPath: AppImages.snapchat,
+      url: "https://www.snapchat.com/@verify_real",
+    ),
+  ];
+
 
   @override
   void initState() {
@@ -94,9 +151,13 @@ class _ProfileState extends State<Profile> {
 
 
   void _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
-      throw Exception('Could not launch $url');
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Could not open link")),
+      );
     }
   }
 
@@ -164,17 +225,54 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Widget _optionTile(String title, IconData icon, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.blue),
-      title: Text(title,
+  Widget _optionTile(
+      String title,
+      IconData icon,
+      VoidCallback onTap, {
+        String? subtitle,
+      }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.blue),
+        title: Text(
+          title,
           style: const TextStyle(
-              fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black)),
-      trailing: const Icon(Icons.arrow_forward_ios_rounded,
-          size: 16, color: Colors.black),
-      onTap: onTap,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: Colors.black
+          ),
+        ),
+        subtitle: subtitle != null
+            ? Text(
+          subtitle,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Colors.black54,
+          ),
+        )
+            : null,
+        trailing: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: 16,
+          color: Colors.black38,
+        ),
+        onTap: onTap,
+      ),
     );
   }
+
 
   Future<void> _deleteAccount() async {
     try {
@@ -333,7 +431,7 @@ class _ProfileState extends State<Profile> {
                           },
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundColor: Colors.blue.shade100,
+                            backgroundColor: Colors.white,
                             backgroundImage: _profileImage != null
                                 ? FileImage(_profileImage!)
                                 : _profileImageUrl != null
@@ -372,21 +470,104 @@ class _ProfileState extends State<Profile> {
               const SizedBox(height: 20),
               _infoTile("Email", email, Icons.email),
               _infoTile("Phone", number, Icons.phone),
+              const SizedBox(height: 10),
+              _optionTile(
+                "Wishlist",
+                Icons.favorite_border,
+                    () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WishlistPage()),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+
+              const Divider(color: Colors.black12),
+              const SizedBox(height: 10),
+              _sectionTitle("Legal & Support"),
+
+              _optionTile(
+                "Privacy Policy",
+                Icons.shield_outlined,
+                    () {
+                  _launchURL("https://theverify.in/");
+                },
+                subtitle: "How we collect & use your data",
+              ),
+
+              _optionTile(
+                "Terms & Conditions",
+                Icons.description_outlined,
+                    () {
+                  _launchURL("https://theverify.in/");
+                },
+                subtitle: "Rules for using Verify",
+              ),
+
+              _optionTile(
+                "About Verify",
+                Icons.info_outline,
+                    () {
+                  _launchURL("https://theverify.in/about_us.html");
+                },
+                subtitle: "Who we are & what we do",
+              ),
+
+              _optionTile(
+                "Help & Support",
+                Icons.support_agent_outlined,
+                    () {
+                  _launchURL("https://theverify.in/contact_us.html");
+                },
+                subtitle: "Get help or contact us",
+              ),
+
               const SizedBox(height: 20),
               const Divider(color: Colors.black12),
               const SizedBox(height: 10),
-              _optionTile("Privacy Policies", Icons.shield_outlined, () {
-                _launchURL("https://theverify.in/PrivacyPolicy.html");
-              }),
-              _optionTile("Terms & Conditions", Icons.book_outlined, () {
-                _launchURL("https://theverify.in/TermCondition.html");
-              }),
-              _optionTile("About App", Icons.info_outline, () {
-                _launchURL("https://theverify.in/about.html");
-              }),
-              _optionTile("Help & Support", Icons.help_outline, () {
-                _launchURL("https://theverify.in/contact.html");
-              }),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Connect with us",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        showMoreSocialLinks = !showMoreSocialLinks;
+                      });
+                    },
+                    child: Center(
+                      child: Text(
+                        showMoreSocialLinks ? "Show less ▲" : "Show more ▼",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              _socialGrid(primarySocialLinks),
+
+
+              if (showMoreSocialLinks) ...[
+                const SizedBox(height: 12),
+                _socialGrid(moreSocialLinks),
+              ],
+
+
               const SizedBox(height: 30),
               const Center(
                 child: Text(
@@ -425,4 +606,91 @@ class _ProfileState extends State<Profile> {
       ),
     );
   }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.black87,
+        ),
+      ),
+    );
+  }
+
+  Widget _socialGrid(List<SocialLink> links) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: links.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 1,
+      ),
+      itemBuilder: (context, index) {
+        final link = links[index];
+        return GestureDetector(
+          onTap: () => _launchURL(link.url),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 50, // fixed tap area
+                height: 50,
+                child: Center(
+                  child: Image.asset(
+                    link.assetPath,
+                    width: _iconSizeFor(link.title),
+                    height: _iconSizeFor(link.title),
+                    fit: _iconFitFor(link.title),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 4),
+              Text(
+                link.title,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  double _iconSizeFor(String title) {
+    switch (title) {
+      case 'Twitter':
+        return 32;
+      case 'Facebook':
+        return 36;
+      default:
+        return 48;
+    }
+  }
+
+
+  BoxFit _iconFitFor(String title) {
+    switch (title) {
+      case 'Twitter':
+        return BoxFit.cover; // removes extra padding
+      case 'Facebook':
+        return BoxFit.cover;
+      default:
+        return BoxFit.contain;
+    }
+  }
+
+
 }
+

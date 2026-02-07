@@ -7,6 +7,7 @@ import 'package:Verify/custom_widget/back_button.dart';
 import '../../Themes/theme-helper.dart';
 import '../../custom_widget/FilterBar.dart';
 import '../../custom_widget/Paths.dart';
+import '../../custom_widget/property_card.dart';
 import '../../model/All_model.dart';
 import 'Sub_Srceen/PropertyBylist.dart';
 import 'Sub_Srceen/Types/flat/Rent_flat.dart';
@@ -58,8 +59,9 @@ class _AllPropertyState extends State<AllProperty> {
   }
 
   Future<List<AllModel>> fetchData() async {
+    final userId = await getUserId();
     final url = Uri.parse(
-      "https://verifyserve.social/PHP_Files/show_all_category_website_data/show_all_category_data.php",
+      "https://verifyserve.social/PHP_Files/show_all_category_website_data/show_all_category_data.php?user_id=$userId",
     );
 
     final response = await http.get(url);
