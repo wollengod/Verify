@@ -275,8 +275,17 @@ class _ProfileState extends State<Profile> {
 
 
   Future<void> _deleteAccount() async {
+    if (id == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Invalid user")),
+      );
+      return;
+    }
+
     try {
-      final url = Uri.parse("https://verifyserve.social/PHP_Files/delete_ragister_table/delete_ragister.php");
+      final url = Uri.parse(
+        "https://verifyserve.social/PHP_Files/delete_ragister_table/delete_ragister.php",
+      );
 
       final response = await http.post(
         url,
@@ -284,38 +293,47 @@ class _ProfileState extends State<Profile> {
         body: jsonEncode({'id': id}),
       );
 
-      if (response.statusCode == 200) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.clear();
-
-        if (_profileImage != null && await _profileImage!.exists()) {
-          await _profileImage!.delete();
-          print("Image deleted");
-        }
-
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Account deleted successfully")),
-        );
-
-        await Future.delayed(const Duration(milliseconds: 300));
-
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginPage()),
-              (route) => false,
-        );
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to delete account: ${response.body}")),
-        );
+      if (response.statusCode != 200) {
+        throw Exception("Server error (${response.statusCode})");
       }
+
+      final decoded = jsonDecode(response.body);
+
+      if (decoded['status'] != 'success') {
+        throw Exception(decoded['message'] ?? 'Delete failed');
+      }
+
+      // ✅ Clear local data
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      // ⚠️ Only deletes local cached image (OK)
+      if (_profileImage != null && await _profileImage!.exists()) {
+        await _profileImage!.delete();
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Account deleted successfully")),
+      );
+
+      await Future.delayed(const Duration(milliseconds: 400));
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+            (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}")),
+        SnackBar(
+          content: Text(
+            e.toString().replaceAll('Exception:', '').trim(),
+          ),
+        ),
       );
     }
   }
@@ -491,7 +509,7 @@ class _ProfileState extends State<Profile> {
                 "Privacy Policy",
                 Icons.shield_outlined,
                     () {
-                  _launchURL("https://theverify.in/");
+                  _launchURL("https://theverify.in/Privacy_Policy.html");
                 },
                 subtitle: "How we collect & use your data",
               ),
@@ -500,7 +518,7 @@ class _ProfileState extends State<Profile> {
                 "Terms & Conditions",
                 Icons.description_outlined,
                     () {
-                  _launchURL("https://theverify.in/");
+                  _launchURL("https://theverify.in/Terms_and_condition.html");
                 },
                 subtitle: "Rules for using Verify",
               ),
@@ -560,7 +578,6 @@ class _ProfileState extends State<Profile> {
               const SizedBox(height: 12),
 
               _socialGrid(primarySocialLinks),
-
 
               if (showMoreSocialLinks) ...[
                 const SizedBox(height: 12),
@@ -679,7 +696,6 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-
   BoxFit _iconFitFor(String title) {
     switch (title) {
       case 'Twitter':
@@ -690,7 +706,6 @@ class _ProfileState extends State<Profile> {
         return BoxFit.contain;
     }
   }
-
 
 }
 

@@ -20,15 +20,15 @@ class FlatPropertyTabs extends StatelessWidget {
               indicatorColor: Colors.blue,
               labelStyle: TextStyle(fontWeight: FontWeight.bold),
               tabs: [
-                Tab(text: "Buy Flat"),
                 Tab(text: "Rent Flat"),
+                Tab(text: "Buy Flat"),
               ],
             ),
             const Expanded(
               child: TabBarView(
                 children: [
-                  FlatPropertyBuy(),
                   FlatPropertyPage(),
+                  FlatPropertyBuy(),
                 ],
               ),
             ),

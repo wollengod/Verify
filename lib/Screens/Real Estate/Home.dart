@@ -15,7 +15,6 @@ import 'Sub_Srceen/Types/farmhouse.dart';
 import 'Sub_Srceen/Types/flat/flat tab.dart';
 import 'Sub_Srceen/Types/shop.dart';
 
-
 Future<int?> getUserId() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getInt('id');
@@ -36,7 +35,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   List<Map<String, dynamic>> propertyTypes = [
     {'label': 'Flat', 'icon': Icons.apartment},
     {'label': 'Farmhouse', 'icon': Icons.cottage},
-    {'label': 'Office', 'icon': Icons.location_city},
+    {'label': 'Commercial', 'icon': Icons.location_city},
     {'label': 'Shop', 'icon': Icons.storefront_outlined},
     {'label': 'Godown', 'icon': Icons.warehouse},
   ];
@@ -193,7 +192,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       return const ShopPropertyPage();
                     case 'Farmhouse':
                       return const FarmhousePropertyPage();
-                    case 'Office':
+                    case 'Commercial':
                       return const OfficePropertyPage();
                     default:
                       return PropertyListByType(type: label);
@@ -256,7 +255,7 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
       ),
     );
   }
-//hello
+
   @override
   bool shouldRebuild(_TabBarDelegate oldDelegate) => true;
 }

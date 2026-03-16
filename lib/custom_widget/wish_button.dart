@@ -60,10 +60,6 @@ class _WishlistButtonState extends State<WishlistButton> {
   void initState() {
     super.initState();
     isWishlisted = widget.initialState;
-
-    print("⭐ WishlistButton INIT");
-    print("➡️ Property ID: ${widget.pId}");
-    print("➡️ Initial isWishlisted: $isWishlisted");
   }
 
   Future<void> _toggle() async {
@@ -98,7 +94,6 @@ class _WishlistButtonState extends State<WishlistButton> {
     );
   }
 }
-
 
 class WishlistRemoveButton extends StatefulWidget {
   final int pId;
@@ -233,7 +228,3 @@ class _WishlistRemoveButtonState extends State<WishlistRemoveButton> {
   }
 
 }
-
-
-
-

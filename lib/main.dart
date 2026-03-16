@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Verify/Screens/Splash.dart';
 import 'Themes/theme_provider.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -13,7 +11,7 @@ FlutterLocalNotificationsPlugin();
 
 Future<void> initLocalNotifications() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
+  AndroidInitializationSettings(' ');
 
   const InitializationSettings initializationSettings =
   InitializationSettings(
@@ -39,7 +37,6 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp();
   await initLocalNotifications();
-
 
   FirebaseMessaging.instance.subscribeToTopic("wollengod");
 

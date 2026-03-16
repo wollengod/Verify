@@ -22,6 +22,7 @@ class Full_Property extends StatefulWidget {
 class _Full_PropertyState extends State<Full_Property> {
   Future<List<DetailedPropertyModel>>_propertyFuture = Future.value([]);
   late Future<List<RealEstateSlider>> _sliderFuture;
+  bool isBooked = false;
 
   @override
   void initState() {
@@ -101,6 +102,10 @@ class _Full_PropertyState extends State<Full_Property> {
     required String userName,
     required String phoneNumber,
     required String address, // user’s address or property address
+    required String fieldworkerName, // user’s address or property address
+    required String fieldworkerNumber, // user’s address or property address
+    required String visitingDate,
+    required String visitingTime,
   })
   async {
     final url = Uri.parse(
@@ -112,25 +117,120 @@ class _Full_PropertyState extends State<Full_Property> {
       'property_id': id,
       'locations': location,
       'booking_date': bookingDate,
+      'visiting_date': visitingDate,
+      'visiting_time': visitingTime,
       'descriptions': info,
       'furnished': furnished,
       'addresss': address,
       'BHK': bhk,
       'type_of_property': type,
       'phone_number': phoneNumber,
+      'fieldworkar_name': fieldworkerName,
+      'fieldworkar_number': fieldworkerNumber,
     };
 
     final response = await http.post(url, body: body);
 
     if (response.statusCode == 200 && response.body.contains('success')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Booking Successful')),
-      );
+
+      setState(() {
+        isBooked = true;
+      });
+
+      _showSuccessDialog();
+
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Booking Failed: ${response.body}')),
       );
     }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              // Success Icon Container
+              Container(
+                height: 80,
+                width: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: "#001234".toColor().withOpacity(0.08),
+                ),
+                child: Icon(
+                  Icons.check_rounded,
+                  size: 42,
+                  color: "#001234".toColor(),
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              const Text(
+                "Visit Scheduled!",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              const Text(
+                "Our property advisor will contact you shortly to confirm your visit details.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14.5,
+                  color: Colors.black54,
+                  height: 1.5,
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: "#001234".toColor(),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Done",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -263,46 +363,53 @@ class _Full_PropertyState extends State<Full_Property> {
                             color: "#001234".toColor(),
                             fontWeight: FontWeight.bold)),
                     ElevatedButton(
-                      onPressed: () async {
-                        final propertyList = await _propertyFuture;
-                        final sliderList = await _sliderFuture;
+                      onPressed: isBooked
+                        ? null
+                        : () async {
+                        final bookingData = await _showBookingBottomSheet();
 
+                        if (bookingData == null) return;
+
+                        final propertyList = await _propertyFuture;
                         if (propertyList.isEmpty) return;
+
                         final property = propertyList.first;
 
                         final prefs = await SharedPreferences.getInstance();
-                        final userId = prefs.getInt("id") ?? "0";
-                        final name = prefs.getString("name") ?? "0";
-                        final number = prefs.getString("number") ?? "0";
-
+                        final userId = prefs.getInt("id") ?? 0;
+                        final name = prefs.getString("name") ?? "";
+                        final number = prefs.getString("number") ?? "";
 
                         await bookSchedule(
                           userId: userId.toString(),
                           userName: name,
                           phoneNumber: number,
-                          address: data.apartmentAddress,
-                          id: data.id.toString(),
-                          location: data.location,
-                          info: data.facility,
-                          furnished: data.furnished,
-                          bhk: data.bhk,
-                          type: data.typeOfProperty,
+                          address: property.apartmentAddress,
+                          id: property.id.toString(),
+                          location: property.location,
+                          info: property.facility,
+                          furnished: property.furnished,
+                          bhk: property.bhk,
+                          type: property.typeOfProperty,
+                          fieldworkerName: property.fieldworkerName,
+                          fieldworkerNumber: property.fieldworkerNumber,
+                          visitingDate: bookingData["date"]!,
+                          visitingTime: bookingData["time"]!,
                         );
-
                       },
-  
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: "#001234".toColor(),
+                        backgroundColor: isBooked
+                          ? "#001234".toColor().withOpacity(0.85)
+                            : "#001234".toColor(),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),
                         ),
                       ),
                       child: Text(
-                        "Book Schedule",
+                        isBooked ? "Visit Scheduled" : "Book Schedule",
                         style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white, // Changed from grey to white for better contrast
+                          color: isBooked ?  Colors.white : "#001234".toColor(),
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     )
@@ -324,6 +431,174 @@ class _Full_PropertyState extends State<Full_Property> {
             );
 
           }),
+    );
+  }
+
+  Future<Map<String, String>?> _showBookingBottomSheet() async {
+    DateTime? selectedDate;
+    TimeOfDay? selectedTime;
+
+    return await showModalBottomSheet<Map<String, String>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(25)),
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+
+                  // Drag handle
+                  Container(
+                    height: 5,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Text(
+                    "Schedule Property Visit",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: "#001234".toColor(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // DATE CARD
+                  _selectCard(
+                    icon: Icons.calendar_today,
+                    title: selectedDate == null
+                        ? "Select Visiting Date"
+                        : DateFormat('dd MMM yyyy').format(selectedDate!),
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2030),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: "#001234".toColor(), // header background
+                                onPrimary: Colors.white,      // header text
+                                onSurface: Colors.black87,    // calendar text
+                              ),
+                              textButtonTheme: TextButtonThemeData(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: "#001234".toColor(),
+                                ),
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (picked != null) {
+                        setModalState(() => selectedDate = picked);
+                      }
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // TIME CARD
+                  _selectCard(
+                    icon: Icons.access_time,
+                    title: selectedTime == null
+                        ? "Select Visiting Time"
+                        : selectedTime!.format(context),
+                    onTap: () async {
+                      final picked = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              timePickerTheme: TimePickerThemeData(
+                                backgroundColor: Colors.white,
+                                hourMinuteShape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                hourMinuteColor: "#EEF5FF".toColor(),
+                                dialHandColor: "#001234".toColor(),
+                                dialBackgroundColor: "#EEF5FF".toColor(),
+                                entryModeIconColor: "#001234".toColor(),
+                              ),
+                              colorScheme: ColorScheme.light(
+                                primary: "#001234".toColor(),
+                                onPrimary: "#001234".toColor(),
+                                onSurface: Colors.black87,
+                              ),
+                              textButtonTheme: TextButtonThemeData(
+                                style: TextButton.styleFrom(
+                                  foregroundColor: "#001234".toColor(),
+                                ),
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (picked != null) {
+                        setModalState(() => selectedTime = picked);
+                      }
+                    },
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: "#001234".toColor(),
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (selectedDate == null || selectedTime == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Please select date and time")),
+                        );
+                        return;
+                      }
+
+                      Navigator.pop(context, {
+                        "date":
+                        DateFormat('yyyy-MM-dd').format(selectedDate!),
+                        "time": selectedTime!.format(context),
+                      });
+                    },
+                    child: const Text(
+                      "Confirm Booking",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -526,6 +801,63 @@ class _Full_PropertyState extends State<Full_Property> {
 
 
       ],
+    );
+  }
+
+  Widget _selectCard({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        decoration: BoxDecoration(
+          color: "#EEF5FF".toColor(),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: "#001234".toColor().withOpacity(0.08),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              height: 38,
+              width: 38,
+              decoration: BoxDecoration(
+                color: "#001234".toColor().withOpacity(0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 18,
+                color: "#001234".toColor(),
+              ),
+            ),
+
+            const SizedBox(width: 14),
+
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: Colors.black38,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

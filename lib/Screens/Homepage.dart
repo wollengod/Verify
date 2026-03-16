@@ -3,6 +3,7 @@ import 'package:Verify/Screens/Real%20Estate/Home.dart';
 import 'package:Verify/Screens/Real%20Estate/filter.dart';
 import 'package:Verify/Screens/profile.dart';
 import 'package:Verify/utilities/hex_color.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../custom_widget/Paths.dart';
@@ -56,58 +57,95 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return WillPopScope(
+        onWillPop: () async {
+          if (selectedIndex != 0) {
+            // 👈 Profile → Home
+            onTabTapped(0);
+            return false;
+          }
+
+          // 👈 Home → Ask confirmation
+          final shouldExit = await _showExitDialog(context);
+          return shouldExit;
+        },
+        child: SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title:
-          Image.asset(AppImages.logo2, height: 70),
-          centerTitle: true,
           backgroundColor: "#001234".toColor(),
-          actions: [
-            Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.notifications_none_outlined,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const NotificationInboxPage(),
-                      ),
-                    );
+          automaticallyImplyLeading: false,
 
-                    _refreshUnread(); // 🔑 update dot after return
-                  },
+          flexibleSpace: SafeArea(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // 🔥 Perfectly centered logo
+                Center(
+                  child: Image.asset(
+                    AppImages.logo2,
+                    height: 70,
+                    fit: BoxFit.contain,
+                  ),
                 ),
 
-                if (hasUnread)
-                  Positioned(
-                    right: 12,
-                    top: 12,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.blueAccent,
-                        shape: BoxShape.circle,
+                // 👉 Actions stay on the right
+                Positioned(
+                  right: 0,
+                  child: Row(
+                    children:
+                    [
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.notifications_none_outlined,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                            onPressed: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const NotificationInboxPage(),
+                                ),
+                              );
+                              _refreshUnread();
+                            },
+                          ),
+                          if (hasUnread)
+                            const Positioned(
+                              right: 12,
+                              top: 12,
+                              child: CircleAvatar(
+                                radius: 4,
+                                backgroundColor: Colors.blueAccent,
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
+
+                      IconButton(
+                        icon: const Icon(
+                          Icons.tune_sharp,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => FilterProperty(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 10),
+                    ],
                   ),
+                ),
               ],
             ),
-
-
-            IconButton(onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)
-                  => FilterProperty()
-              ));
-            }, icon: Icon(Icons.tune_sharp,color: Colors.white,size: 30,)),
-            const SizedBox(width: 10,),
-          ],
+          ),
         ),
         body: PageView(
           controller: pageController,
@@ -155,6 +193,122 @@ class _HomepageState extends State<Homepage> {
         ),
           ]
       ),
-    ));
+    )));
   }
+
+  Future<bool> _showExitDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 🔵 Soft brand icon
+              Container(
+                height: 56,
+                width: 56,
+                decoration: BoxDecoration(
+                  color: "#001234".toColor().withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.exit_to_app_rounded,
+                  color: "#001234".toColor(),
+                  size: 28,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              const Text(
+                "Exit Verify?",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              const Text(
+                "Are you sure you want to close the app?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                  height: 1.4,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Row(
+                children: [
+                  // Cancel
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () { Navigator.pop(context, false);
+                        HapticFeedback.selectionClick(); //vibration
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: "#001234".toColor().withOpacity(0.4),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: Text(
+                        "Stay",
+                        style: TextStyle(
+                          color: "#001234".toColor(),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () { Navigator.pop(context, true);
+                      HapticFeedback.selectionClick(); //vibration
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: "#001234".toColor(),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text(
+                        "Exit",
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ) ?? false;
+  }
+
 }

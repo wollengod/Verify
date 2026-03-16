@@ -53,8 +53,6 @@ class HealthPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 30),
-            CircularProgressIndicator(color: Colors.black,),
-            SizedBox(height: 30),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: "#001234".toColor(),
