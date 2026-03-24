@@ -21,7 +21,7 @@ class _ForgetState extends State<Forget> {
     setState(() => _isLoading = true);
 
     final apiKey = "ceabde09-483f-11f0-a562-0200cd936042";
-    final url = Uri.parse('https://verifyserve.social/WebService4.asmx/CheckMobileNumber?FNumber=$number');
+    final url = Uri.parse('https://verifyrealestateandservices.in/WebService4.asmx/CheckMobileNumber?FNumber=$number');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

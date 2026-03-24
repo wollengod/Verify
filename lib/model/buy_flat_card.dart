@@ -46,7 +46,7 @@ class BuyFlatCard extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        "https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
+                        "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
                         height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,

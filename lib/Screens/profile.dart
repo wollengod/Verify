@@ -108,7 +108,7 @@ class _ProfileState extends State<Profile> {
       }
 
       var uri = Uri.parse(
-          'https://verifyserve.social/Second%20PHP%20FILE/profie_image_update_main_realestate/profile_image_update.php');
+          'https://verifyrealestateandservices.in/Second%20PHP%20FILE/profie_image_update_main_realestate/profile_image_update.php');
 
       var request = http.MultipartRequest('POST', uri);
       request.fields['id'] = userId;
@@ -124,7 +124,7 @@ class _ProfileState extends State<Profile> {
         if (respJson['status'] == 'success') {
           String imagePath = respJson['image_path'];
           String fullUrl =
-              'https://verifyserve.social/Second%20PHP%20FILE/profie_image_update_main_realestate/$imagePath';
+              'https://verifyrealestateandservices.in/Second%20PHP%20FILE/profie_image_update_main_realestate/$imagePath';
 
           await prefs.setString('profile_image_url', fullUrl);
 
@@ -284,7 +284,7 @@ class _ProfileState extends State<Profile> {
 
     try {
       final url = Uri.parse(
-        "https://verifyserve.social/PHP_Files/delete_ragister_table/delete_ragister.php",
+        "https://verifyrealestateandservices.in/PHP_Files/delete_ragister_table/delete_ragister.php",
       );
 
       final response = await http.post(

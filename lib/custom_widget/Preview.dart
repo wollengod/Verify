@@ -40,7 +40,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
             onPageChanged: (index) => setState(() => _currentIndex = index),
             builder: (context, index) {
               return PhotoViewGalleryPageOptions(
-                imageProvider: NetworkImage('https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${widget.imageUrls[index]}'),
+                imageProvider: NetworkImage('https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_realestate/${widget.imageUrls[index]}'),
                 minScale: PhotoViewComputedScale.contained,
                 maxScale: PhotoViewComputedScale.covered * 3.0,
                 initialScale: PhotoViewComputedScale.contained,

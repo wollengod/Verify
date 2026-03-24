@@ -22,8 +22,8 @@ async {
 
   final Uri url = Uri.parse(
     isWishlisted
-        ? "https://verifyserve.social/Second%20PHP%20FILE/main_application/wishlist_remove.php"
-        : "https://verifyserve.social/Second%20PHP%20FILE/main_application/wishlist_add.php",
+        ? "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/wishlist_remove.php"
+        : "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/wishlist_add.php",
   );
 
   final response = await http.post(url, body: {
@@ -122,7 +122,7 @@ class _WishlistRemoveButtonState extends State<WishlistRemoveButton> {
     if (userId == null) return;
 
     final url = Uri.parse(
-      "https://verifyserve.social/Second%20PHP%20FILE/main_application/wishlist_remove.php",
+      "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/wishlist_remove.php",
     );
 
     final res = await http.post(url, body: {

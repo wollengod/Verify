@@ -47,7 +47,7 @@ class _Full_PropertyState extends State<Full_Property> {
   Future<List<DetailedPropertyModel>> fetchProperty(String? id) async {
     print("Detail page Id: $id ");
     final response = await http.get(Uri.parse(
-        "https://verifyserve.social/Second%20PHP%20FILE/main_application/details_page.php?P_id=$id"));
+        "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/details_page.php?P_id=$id"));
 
     if (response.statusCode == 200) {
       final decoded = json.decode(response.body);
@@ -71,7 +71,7 @@ class _Full_PropertyState extends State<Full_Property> {
 
   Future<List<RealEstateSlider>> fetchSlider(String? id) async {
     final response = await http.get(Uri.parse(
-        "https://verifyserve.social/Second%20PHP%20FILE/main_realestate_for_website/show_multiple_image_in_main_realestate.php?subid=$id"));
+        "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_realestate_for_website/show_multiple_image_in_main_realestate.php?subid=$id"));
     print("Slider Id: ${id}");
 
     if (response.statusCode == 200) {
@@ -109,7 +109,7 @@ class _Full_PropertyState extends State<Full_Property> {
   })
   async {
     final url = Uri.parse(
-        'https://verifyserve.social/Second%20PHP%20FILE/book_shedual/book_shedual.php');
+        'https://verifyrealestateandservices.in/Second%20PHP%20FILE/book_shedual/book_shedual.php');
 
     final body = {
       'user_ids': userId,
@@ -280,7 +280,7 @@ class _Full_PropertyState extends State<Full_Property> {
                       VideoPlayerWidget(
                         videoUrl: data.videoLink,
                         fallbackImageUrl:
-                        'https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${data.propertyPhoto}',
+                        'https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_realestate/${data.propertyPhoto}',
                       ),
 
                       FutureBuilder<List<RealEstateSlider>>(
@@ -628,7 +628,7 @@ class _Full_PropertyState extends State<Full_Property> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    'https://verifyserve.social/Second%20PHP%20FILE/main_realestate/$img',
+                    'https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_realestate/$img',
                     width: 80,
                     height: 70,
                     fit: BoxFit.cover,

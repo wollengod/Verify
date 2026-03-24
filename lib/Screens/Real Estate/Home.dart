@@ -64,7 +64,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   Future<List<Catid>> fetchData() async {
     final url = Uri.parse(
-      "https://verifyserve.social/WebService4.asmx/show_RealEstate_by_fieldworkarnumber?fieldworkarnumber=9711775300&looking=Flat",
+      "https://verifyrealestateandservices.in/WebService4.asmx/show_RealEstate_by_fieldworkarnumber?fieldworkarnumber=9711775300&looking=Flat",
     );
     final response = await http.get(url);
     if (response.statusCode == 200) {

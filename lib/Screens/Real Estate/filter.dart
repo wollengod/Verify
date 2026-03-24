@@ -78,7 +78,7 @@ class _FilterPropertyState extends State<FilterProperty> {
 
     // Build query string
     final uri = Uri.parse(
-      "https://verifyserve.social/WebService4.asmx/filter_main_application"
+      "https://verifyrealestateandservices.in/WebService4.asmx/filter_main_application"
           "?user_id=$userId,Buy_Rent=$selectedBuyRent"
           "&Bhk=$selectedBHK"
           "&Typeofproperty=$selectedProperty"
@@ -124,7 +124,7 @@ class _FilterPropertyState extends State<FilterProperty> {
 
   Future<List<OfficePropertyModel>> fetchData() async {
     final url = Uri.parse(
-        "https://verifyserve.social/Second%20PHP%20FILE/main_application/all_data.php");
+        "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/all_data.php");
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
@@ -590,7 +590,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      "https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
+                      "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
                       height: 160,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -724,7 +724,7 @@ class _FilterPropertyState extends State<FilterProperty> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      "https://verifyserve.social/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
+                      "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_realestate/${item.propertyPhoto}",
 
                       height: 160,
                       width: double.infinity,

@@ -61,7 +61,7 @@ class _AllPropertyState extends State<AllProperty> {
   Future<List<AllModel>> fetchData() async {
     final userId = await getUserId();
     final url = Uri.parse(
-      "https://verifyserve.social/PHP_Files/show_all_category_website_data/show_all_category_data.php?user_id=$userId",
+      "https://verifyrealestateandservices.in/PHP_Files/show_all_category_website_data/show_all_category_data.php?user_id=$userId",
     );
 
     final response = await http.get(url);
@@ -280,7 +280,7 @@ class _AllPropertyState extends State<AllProperty> {
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               child: Image.network(
-                "https://verifyserve.social/${item.Building_image}",
+                "https://verifyrealestateandservices.in/${item.Building_image}",
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,

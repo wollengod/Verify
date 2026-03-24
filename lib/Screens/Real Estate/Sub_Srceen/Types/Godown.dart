@@ -25,7 +25,7 @@ class _GodownPropertyPageState extends State<GodownPropertyPage> {
     final userId = await getUserId();
 
     final url = Uri.parse(
-      "https://verifyserve.social/Second%20PHP%20FILE/main_application/Godown.php?user_id=$userId",
+      "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/Godown.php?user_id=$userId",
     );
 
     final response = await http.get(url);

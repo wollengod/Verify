@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passController = TextEditingController();
 
   Future<void>loginUser() async {
-    const String url = 'https://verifyserve.social/PHP_Files/Login_Main_App/Login_Main_APP.php';
+    const String url = 'https://verifyrealestateandservices.in/PHP_Files/Login_Main_App/Login_Main_APP.php';
     final response  = await http.post(Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(

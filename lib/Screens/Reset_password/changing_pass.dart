@@ -29,7 +29,7 @@ class _PasswordState extends State<Password> {
     final num = number.text.trim();
     final pass = password.text.trim();
     final url = Uri.parse(
-        'https://verifyserve.social/WebService4.asmx/ResetPassword?FNumber=$num&Password=$pass');
+        'https://verifyrealestateandservices.in/WebService4.asmx/ResetPassword?FNumber=$num&Password=$pass');
 
     final response = await http.get(url);
 

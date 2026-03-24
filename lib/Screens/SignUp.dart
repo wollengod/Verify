@@ -189,7 +189,7 @@ class _SignUpPageState extends State<SignUpPage> {
   void _handleSignUp() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      final url = Uri.parse('https://verifyserve.social/PHP_Files/Ragister_Main_App/ragister.php');
+      final url = Uri.parse('https://verifyrealestateandservices.in/PHP_Files/Ragister_Main_App/ragister.php');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},

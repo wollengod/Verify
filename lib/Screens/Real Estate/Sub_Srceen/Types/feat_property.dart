@@ -31,8 +31,8 @@
 //     setState(() {
 //       _number = number;
 //       _futureFeatured = fetchData(" ");
-//       _futureSell = fetchData("https://verifyserve.social/Second%20PHP%20FILE/show_data_sale_property/show_data_for_sale_property.php");
-//       _futureRent = fetchData("https://verifyserve.social/Second%20PHP%20FILE/show_data_rent_property/show_data_rent_property.php");
+//       _futureSell = fetchData("https://verifyrealestateandservices.in/Second%20PHP%20FILE/show_data_sale_property/show_data_for_sale_property.php");
+//       _futureRent = fetchData("https://verifyrealestateandservices.in/Second%20PHP%20FILE/show_data_rent_property/show_data_rent_property.php");
 //     });
 //   }
 //
@@ -170,7 +170,7 @@
 //               ClipRRect(
 //                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
 //                 child: Image.network(
-//                   "https://verifyserve.social/${item.Building_image}",
+//                   "https://verifyrealestateandservices.in/${item.Building_image}",
 //                   height: 180,
 //                   width: double.infinity,
 //                   fit: BoxFit.cover,
@@ -275,7 +275,7 @@
 //               ClipRRect(
 //                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
 //                 child: Image.network(
-//                   "https://verifyserve.social/${item.Building_image}",
+//                   "https://verifyrealestateandservices.in/${item.Building_image}",
 //                   height: 165,
 //                   width: double.infinity,
 //                   fit: BoxFit.cover,

@@ -29,7 +29,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
   Future<List<FilterPropertyModel>> fetchSearchResults(String keyword) async {
     final userId = await getUserId();
-    final url = Uri.parse("https://verifyserve.social/Second%20PHP%20FILE/search%20api/search.php?user_id=$userId");
+    final url = Uri.parse("https://verifyrealestateandservices.in/Second%20PHP%20FILE/search%20api/search.php?user_id=$userId");
 
     final response = await http.post(
       url,
@@ -180,7 +180,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               child: Image.network(
-                "https://verifyserve.social/${item.realstateImage}",
+                "https://verifyrealestateandservices.in/${item.realstateImage}",
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,

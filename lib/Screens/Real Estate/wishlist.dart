@@ -30,7 +30,7 @@ class _WishlistPageState extends State<WishlistPage> {
     if (userId == null) return;
 
     final url = Uri.parse(
-      "https://verifyserve.social/Second%20PHP%20FILE/main_application/wishlist_show.php?user_id=$userId",
+      "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/wishlist_show.php?user_id=$userId",
     );
 
     final res = await http.get(url);
