@@ -1,4 +1,6 @@
 gradle-wrapper.jar
+android/app/upload-keystore.jks
+android/key.properties
 /.gradle
 /captures/
 /gradlew

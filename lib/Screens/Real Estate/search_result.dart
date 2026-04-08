@@ -29,15 +29,16 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
   Future<List<FilterPropertyModel>> fetchSearchResults(String keyword) async {
     final userId = await getUserId();
-    final url = Uri.parse("https://verifyrealestateandservices.in/Second%20PHP%20FILE/search%20api/search.php?user_id=$userId");
+
+    final url = Uri.parse(
+        "https://verifyrealestateandservices.in/Second%20PHP%20FILE/search%20api/search.php?user_id=$userId"
+    );
 
     final response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+      body: {
+        'search': keyword.trim(),
       },
-      body: json.encode({'search': keyword.trim()}),
     );
 
     print("Response: ${response.body}");
@@ -47,18 +48,10 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
       if (jsonData['status'] == 'success') {
         final List rawList = jsonData['data'];
-        print("✅ Raw data length: ${rawList.length}");
 
-        List<FilterPropertyModel> parsedList = [];
-        for (var e in rawList) {
-          try {
-            parsedList.add(FilterPropertyModel.fromJson(e));
-          } catch (err) {
-            print("❌ Failed to parse item: $err\nItem: $e");
-          }
-        }
-
-        return parsedList;
+        return rawList
+            .map((e) => FilterPropertyModel.fromJson(e))
+            .toList();
       } else {
         throw Exception(jsonData['message'] ?? 'No data found.');
       }
@@ -66,6 +59,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
       throw Exception("Server error: ${response.statusCode}");
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -7,7 +7,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Verify/utilities/hex_color.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -46,13 +45,6 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
 
   List<File> issueImages = [];
   final ImagePicker _picker = ImagePicker();
-
-
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
-  }
 
   final List<String> timeSlots = [
     '09:00 AM - 12:00 PM',
@@ -115,36 +107,46 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
   }
 
   Future<void> _getCurrentLocation() async {
-    if (await _checkLocationPermission()) {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
 
-      setState(() {
-        latitude = position.latitude;
-        longitude = position.longitude;
-        _Latitude.text = latitude.toString();
-        _Longitude.text = longitude.toString();
-      });
-    } else {
-      await _requestLocationPermission();
-    }
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      latitude = position.latitude;
+      longitude = position.longitude;
+      _Latitude.text = latitude.toString();
+      _Longitude.text = longitude.toString();
+    });
   }
 
-  Future<bool> _checkLocationPermission() async {
-    var status = await Permission.location.status;
-    return status == PermissionStatus.granted;
-  }
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
 
-  Future<void> _requestLocationPermission() async {
-    var status = await Permission.location.request();
-    if (status == PermissionStatus.granted) {
-      // Permission granted, try getting the location again
-      await _getCurrentLocation();
-    } else {
-      // Permission denied, handle accordingly
-      print('Location permission denied');
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      showSnack("Location services are disabled.", error: true);
+      return false;
     }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        showSnack("Location permission denied", error: true);
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      showSnack("Location permanently denied", error: true);
+      return false;
+    }
+
+    return true;
   }
 
   void fetchPlaceSuggestions(String input) {
@@ -384,30 +386,37 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
 
                 SizedBox(height: 20),
                 InkWell(
+
                   onTap: () async {
+                    setState(() => isLoading = true); // 👈 show loader
+
+                    await _getCurrentLocation();
+
                     if (latitude != null && longitude != null) {
                       try {
-                        List<Placemark> placemarks = await placemarkFromCoordinates(latitude!, longitude!);
+                        List<Placemark> placemarks =
+                        await placemarkFromCoordinates(latitude!, longitude!);
 
                         if (placemarks.isNotEmpty) {
                           Placemark place = placemarks.first;
-                          String output = "${place.street}, ${place.locality}, ${place.subLocality}, "
-                              "${place.administrativeArea}, ${place.subAdministrativeArea}, "
-                              "${place.country}, ${place.postalCode}";
+
+                          String output =
+                              "${place.street}, ${place.locality}, ${place.subLocality}, "
+                              "${place.administrativeArea}, ${place.country}, ${place.postalCode}";
 
                           setState(() {
                             full_address = output;
                             locationController.text = full_address;
                           });
-
-                          print('Your Current Address: $full_address');
                         }
                       } catch (e) {
-                        print("Error fetching placemark: $e");
+                        showSnack("Error fetching address", error: true);
                       }
                     } else {
                       showSnack("⚠️ Location not available", error: true);
                     }
+
+                    setState(() => isLoading = false); // 👈 stop loader
                   },
 
                   child: Container(

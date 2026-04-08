@@ -23,19 +23,42 @@ class _FilterPropertyState extends State<FilterProperty> {
   String selectedBHK = '1 BHK';
   String selectedPlace = 'Sultanpur';
   String selectedProperty = 'Flat';
+
+  final List<String> buyRentOptions = ['Buy', 'Rent'];
+  final List<String> bhkOptions = [
+    '1 BHK',
+    '2 BHK',
+    '3 BHK',
+    '1 RK',
+    'Commercial',
+  ];
+  final List<String> placeOptions = [
+    'Sultanpur',
+    'Chhattarpur',
+    'Manglapuri',
+    'Rajpur Khurd'
+  ];
+  final List<String> PropertyOptions = [
+    'Flat',
+    'Shop',
+    'Godown',
+    'Office',
+  ];
+
   bool isFiltering = false;
   List<FilterPropertyModel> filteredData = [];
   bool noResult = false;
   Future<List<OfficePropertyModel>>? _futureData;
+
   double _minBudget = 0.0;
   double _maxBudget = 500.0;
-
 
   @override
   void initState() {
     super.initState();
     _futureData = fetchData();
   }
+
   Widget buildFilterButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -119,9 +142,6 @@ class _FilterPropertyState extends State<FilterProperty> {
     }
   }
 
-
-
-
   Future<List<OfficePropertyModel>> fetchData() async {
     final url = Uri.parse(
         "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/all_data.php");
@@ -137,28 +157,6 @@ class _FilterPropertyState extends State<FilterProperty> {
       throw Exception('Failed to load data');
     }
   }
-
-  final List<String> buyRentOptions = ['Buy', 'Rent'];
-  final List<String> bhkOptions = [
-    '1 BHK',
-    '2 BHK',
-    '3 BHK',
-    '1 RK',
-    'Commercial',
-  ];
-  final List<String> placeOptions = [
-    'Sultanpur',
-    'Chhattarpur',
-    'Manglapuri',
-    'Rajpur Khurd'
-  ];
-
-  final List<String> PropertyOptions = [
-    'Flat',
-    'Shop',
-    'Godown',
-    'Office',
-  ];
 
   void clearFilters() {
     setState(() {
@@ -326,8 +324,6 @@ class _FilterPropertyState extends State<FilterProperty> {
     );
   }
 
-
-
   Widget _buildFilterRow() {
     return Container(
       color: Colors.white,
@@ -369,7 +365,7 @@ class _FilterPropertyState extends State<FilterProperty> {
               _dropdownCard('Property Type', PropertyOptions, selectedProperty, (val) {
                 setState(() => selectedProperty = val!);
               }),
-              _buildBudgetSlider(),
+              // _buildBudgetSlider(),
 
             ],
           ),
@@ -470,7 +466,6 @@ class _FilterPropertyState extends State<FilterProperty> {
     );
   }
 
-
   String _formatPrice(double value) {
     if (value >= 100) {
       return '₹ ${(value / 100).toStringAsFixed(1)} Cr';
@@ -478,7 +473,6 @@ class _FilterPropertyState extends State<FilterProperty> {
       return '₹ ${value.toStringAsFixed(0)} L';
     }
   }
-
 
   Widget _dropdownCard(String label, List<String> items, String selectedValue, Function(String?) onChanged) {
     return SizedBox(
@@ -514,8 +508,6 @@ class _FilterPropertyState extends State<FilterProperty> {
       ),
     );
   }
-
-
 
   Widget _buildFilteredResults() {
     if (isFiltering) {
@@ -694,7 +686,6 @@ class _FilterPropertyState extends State<FilterProperty> {
     );
   }
 
-
   Widget propertyCard2(FilterPropertyModel item) {
     final rawPrice = item.showPrice;
 
@@ -828,6 +819,7 @@ class _FilterPropertyState extends State<FilterProperty> {
       ),
     );
   }
+
   Widget _nestedSpecCard(IconData icon, String label) {
     return Card(
       elevation: 3,
@@ -853,7 +845,6 @@ class _FilterPropertyState extends State<FilterProperty> {
       child: Text(label, style: const TextStyle(fontSize: 11, color: Colors.white)),
     );
   }
-
 
   Widget featureIcon(IconData icon, String label) {
     return Row(

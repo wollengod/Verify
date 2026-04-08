@@ -361,7 +361,7 @@ class _ProfileState extends State<Profile> {
               ),
               const SizedBox(height: 12),
               const Text(
-                "This action is permanent and cannot be undone.\nAre you absolutely sure?",
+                "This will permanently delete your account and associated data from our servers.",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 15, color: Colors.black54),
               ),

@@ -27,25 +27,6 @@ class _HomepageState extends State<Homepage> {
 
   bool hasUnread = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _forceUnreadForTesting(); // 👈 TEMP
-    _refreshUnread();
-  }
-
-  Future<void> _forceUnreadForTesting() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('has_unread_notifications', true);
-  }
-
-  Future<void> _refreshUnread() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      hasUnread = prefs.getBool('has_unread_notifications') ?? false;
-    });
-  }
-
   void onTabTapped(int index) {
     setState(() => selectedIndex = index);
     pageController.animateToPage(
@@ -91,39 +72,7 @@ class _HomepageState extends State<Homepage> {
                 // 👉 Actions stay on the right
                 Positioned(
                   right: 0,
-                  child: Row(
-                    children:
-                    [
-                      Stack(
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.notifications_none_outlined,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                            onPressed: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const NotificationInboxPage(),
-                                ),
-                              );
-                              _refreshUnread();
-                            },
-                          ),
-                          if (hasUnread)
-                            const Positioned(
-                              right: 12,
-                              top: 12,
-                              child: CircleAvatar(
-                                radius: 4,
-                                backgroundColor: Colors.blueAccent,
-                              ),
-                            ),
-                        ],
-                      ),
-
+                  child:
                       IconButton(
                         icon: const Icon(
                           Icons.tune_sharp,
@@ -139,9 +88,6 @@ class _HomepageState extends State<Homepage> {
                           );
                         },
                       ),
-                      const SizedBox(width: 10),
-                    ],
-                  ),
                 ),
               ],
             ),
