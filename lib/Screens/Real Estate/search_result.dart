@@ -20,6 +20,7 @@ class SearchResultPage extends StatefulWidget {
 
 class _SearchResultPageState extends State<SearchResultPage> {
   late Future<List<FilterPropertyModel>> _futureData;
+  int totalResults = 0;
 
   @override
   void initState() {
@@ -28,32 +29,31 @@ class _SearchResultPageState extends State<SearchResultPage> {
   }
 
   Future<List<FilterPropertyModel>> fetchSearchResults(String keyword) async {
-    final userId = await getUserId();
+    final query = keyword.trim().replaceAll(" ", "%20");
 
     final url = Uri.parse(
-        "https://verifyrealestateandservices.in/Second%20PHP%20FILE/search%20api/search.php?user_id=$userId"
-    );
+      "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/search_api_for_main_application.php",
+    ).replace(queryParameters: {
+      "search": keyword.trim(),
+    });
 
-    final response = await http.post(
-      url,
-      body: {
-        'search': keyword.trim(),
-      },
-    );
+    final response = await http.get(url); // ✅ changed to GET
 
     print("Response: ${response.body}");
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
 
-      if (jsonData['status'] == 'success') {
+      // ✅ FIXED: status is now bool
+      if (jsonData['status'] == true) {
+        totalResults = jsonData['total_records'] ?? 0;
         final List rawList = jsonData['data'];
 
         return rawList
             .map((e) => FilterPropertyModel.fromJson(e))
             .toList();
       } else {
-        throw Exception(jsonData['message'] ?? 'No data found.');
+        throw Exception("No data found");
       }
     } else {
       throw Exception("Server error: ${response.statusCode}");
@@ -65,8 +65,19 @@ class _SearchResultPageState extends State<SearchResultPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Results for '${widget.keyword}'",style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.blue.shade900,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Search Results",
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            Text(
+              widget.keyword,
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+          ],
+        ),        backgroundColor: Colors.blue.shade900,
         leading: CustomBackButton(),
       ),
       body: FutureBuilder<List<FilterPropertyModel>>(
@@ -83,7 +94,23 @@ class _SearchResultPageState extends State<SearchResultPage> {
           final data = snapshot.data ?? [];
 
           if (data.isEmpty) {
-            return const Center(child: Text("No matching properties found.",style: TextStyle(color: Colors.black)));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.search_off, size: 60, color: Colors.grey),
+                  SizedBox(height: 10),
+                  Text(
+                    "No results found",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    "Try different keywords",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
           }
 
           return Column(
@@ -102,7 +129,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                     const Icon(Icons.info_outline, size: 18, color: Colors.blue),
                     const SizedBox(width: 8),
                     Text(
-                      "${data.length} property result(s) found",
+                      "${totalResults > 0 ? totalResults : data.length} properties found",
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -132,112 +159,4 @@ class _SearchResultPageState extends State<SearchResultPage> {
     );
   }
 
-  Widget _iconText(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: Colors.grey),
-        const SizedBox(width: 4),
-        Text(text, style: const TextStyle(fontSize: 13, color: Colors.black87)),
-      ],
-    );
-  }
-
-  Widget _buildFlatCard(SearchModel item) {
-    return GestureDetector(
-      onTap: () async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setInt('id_Building', int.parse(item.pvrId));
-        prefs.setString('id_Longitude', item.longitude);
-        prefs.setString('id_Latitude', item.latitude);
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Full_Property()),
-        );
-      },
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: Image.network(
-                "https://verifyrealestateandservices.in/${item.realstateImage}",
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 200,
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.image_not_supported, size: 40),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.place.isNotEmpty ? item.place : "Unknown Place",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _iconText(Icons.meeting_room, item.typeOfProperty),
-                      _iconText(Icons.elevator, item.floor),
-                      _iconText(Icons.balcony, item.balcony),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Rent: ₹${item.propertyNumber}",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Text(
-                        item.furnished,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

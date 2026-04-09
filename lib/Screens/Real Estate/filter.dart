@@ -93,16 +93,14 @@ class _FilterPropertyState extends State<FilterProperty> {
   }
 
   Future<void> filterProperties() async {
-    final userId = await getUserId();
     setState(() {
       isFiltering = true;
       noResult = false;
     });
 
-    // Build query string
     final uri = Uri.parse(
-      "https://verifyrealestateandservices.in/WebService4.asmx/filter_main_application"
-          "?user_id=$userId,Buy_Rent=$selectedBuyRent"
+      "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/filter_api_for_mainapplication.php"
+          "?Buy_Rent=$selectedBuyRent"
           "&Bhk=$selectedBHK"
           "&Typeofproperty=$selectedProperty"
           "&locations=$selectedPlace",
@@ -114,29 +112,40 @@ class _FilterPropertyState extends State<FilterProperty> {
       if (response.statusCode == 200) {
         final decoded = json.decode(response.body);
 
-        if (decoded is List && decoded.isNotEmpty) {
-          setState(() {
-            filteredData = decoded
-                .map<FilterPropertyModel>((item) => FilterPropertyModel.fromJson(item))
-                .toList();
-            noResult = false;
-          });
+        /// ✅ NEW STRUCTURE FIX
+        if (decoded['status'] == true && decoded['data'] != null) {
+          List dataList = decoded['data'];
+
+          if (dataList.isNotEmpty) {
+            setState(() {
+              filteredData = dataList
+                  .map<FilterPropertyModel>(
+                      (item) => FilterPropertyModel.fromJson(item))
+                  .toList();
+              noResult = false;
+            });
+          } else {
+            setState(() {
+              filteredData = [];
+              noResult = true;
+            });
+          }
         } else {
           setState(() {
-            noResult = true;
             filteredData = [];
+            noResult = true;
           });
         }
       } else {
         throw Exception('Failed to load filtered data');
       }
     } catch (e) {
+      print("ERROR: $e");
       setState(() {
         isFiltering = false;
         noResult = true;
         filteredData = [];
       });
-      print("Error parsing JSON or fetching data: $e");
     } finally {
       setState(() => isFiltering = false);
     }
@@ -388,81 +397,6 @@ class _FilterPropertyState extends State<FilterProperty> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildBudgetSlider() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Budget in ₹",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-            fontFamily: 'Poppins',
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Min : ₹ ${_minBudget.toStringAsFixed(1)} ${_minBudget < 1 ? "L" : "Cr"}",
-              style:  TextStyle(
-                color: "#001234".toColor(),
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                fontFamily: 'Poppins',
-              ),
-            ),
-            Text(
-              "Max : ₹ ${_maxBudget.toStringAsFixed(1)} ${_maxBudget < 1 ? "L" : "Cr"}${_maxBudget >= 5 ? "+" : ""}",
-              style:  TextStyle(
-                color: "#001234".toColor(),
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                fontFamily: 'Poppins',
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        RangeSlider(
-          values: RangeValues(_minBudget, _maxBudget),
-          min: 0,
-          max: 500, // up to 5 Cr in Lakh
-          divisions: 100, // smoother thumb control
-          activeColor: "#001234".toColor(),
-          inactiveColor: Colors.grey.shade500,
-          labels: RangeLabels(
-            _formatPrice(_minBudget),
-            _formatPrice(_maxBudget),
-          ),
-          onChanged: (RangeValues values) {
-            setState(() {
-              _minBudget = values.start;
-              _maxBudget = values.end;
-            });
-          },
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text("₹ 0 L", style: TextStyle(fontFamily: 'Poppins')),
-              Text("₹ 1 Cr"),
-              Text("₹ 2 Cr"),
-              Text("₹ 3 Cr"),
-              Text("₹ 4 Cr"),
-              Text("₹ 5 Cr+"),
-            ],
-          ),
-        ),
-
-      ],
     );
   }
 

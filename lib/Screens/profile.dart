@@ -163,15 +163,19 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _loadUserData() async {
     final sharedPref = await SharedPreferences.getInstance();
+
+    final imageUrl = sharedPref.getString('profile_image_url');
+
+    print("LOADED IMAGE URL: $imageUrl"); // 👈 DEBUG
+
     setState(() {
       name = sharedPref.getString('name') ?? '';
       email = sharedPref.getString('email') ?? '';
       number = sharedPref.getString('number') ?? '';
       id = sharedPref.getInt('id') ?? 0;
-      _profileImageUrl = sharedPref.getString('profile_image_url');
+      _profileImageUrl = imageUrl;
     });
   }
-
   Future<void> _logout() async {
     final sharedPref = await SharedPreferences.getInstance();
     await sharedPref.clear();
@@ -450,12 +454,20 @@ class _ProfileState extends State<Profile> {
                           child: CircleAvatar(
                             radius: 50,
                             backgroundColor: Colors.white,
-                            backgroundImage: _profileImage != null
-                                ? FileImage(_profileImage!)
-                                : _profileImageUrl != null
-                                ? NetworkImage(_profileImageUrl!)
-                                : AssetImage(AppImages.profile) as ImageProvider,
-                          ),
+                            child: ClipOval(
+                              child: (_profileImage != null)
+                                  ? Image.file(_profileImage!, fit: BoxFit.cover, width: 100, height: 100)
+                                  : (_profileImageUrl != null && _profileImageUrl!.isNotEmpty)
+                                  ? Image.network(
+                                _profileImageUrl!,
+                                fit: BoxFit.cover,
+                                width: 100,
+                                height: 100,
+                                errorBuilder: (_, __, ___) => Image.asset(AppImages.profile),
+                              )
+                                  : Image.asset(AppImages.profile),
+                            ),
+                          )
                         ),
                         Positioned(
                           bottom: 0,

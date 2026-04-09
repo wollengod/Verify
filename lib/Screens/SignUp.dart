@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Verify/Screens/Homepage.dart';
@@ -84,13 +85,59 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
-                      buildTextField(_nameController, 'Full Name', Icons.person),
+                      buildTextField(
+                        _nameController,
+                        'Full Name',
+                        Icons.person,
+                        validator: (value) =>
+                        value == null || value.trim().isEmpty ? 'Enter full name' : null,
+                      ),
                       const SizedBox(height: 20),
-                      buildTextField(_mobileController, 'Phone Number', Icons.call, keyboardType: TextInputType.phone),
+                      buildTextField(
+                        _mobileController,
+                        'Phone Number',
+                        Icons.call,
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Enter phone number';
+                          }
+                          if (value.length != 10) {
+                            return 'Enter valid 10-digit number';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 20),
-                      buildTextField(_emailController, 'Email Address', Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+                      buildTextField(
+                        _emailController,
+                        'Email Address',
+                        Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Enter email';
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            return 'Enter valid email';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 20),
-                      buildTextField(_passController, 'Password', Icons.lock_outline, isPassword: true),
+                      buildTextField(
+                        _passController,
+                        'Password',
+                        Icons.lock_outline,
+                        isPassword: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Enter password';
+                          if (value.length < 6) return 'Min 6 characters required';
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 30),
 
                       GestureDetector(
@@ -146,8 +193,15 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget buildTextField(TextEditingController controller, String hint, IconData icon,
-      {bool isPassword = false, TextInputType keyboardType = TextInputType.text}) {
+  Widget buildTextField(
+      TextEditingController controller,
+      String hint,
+      IconData icon, {
+        bool isPassword = false,
+        TextInputType keyboardType = TextInputType.text,
+        String? Function(String?)? validator,
+        List<TextInputFormatter>? inputFormatters,
+      }) {
     return Container(
       decoration: BoxDecoration(
         color: black,
@@ -158,14 +212,9 @@ class _SignUpPageState extends State<SignUpPage> {
         controller: controller,
         obscureText: isPassword && !_showPassword,
         keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
         style: TextStyle(color: white),
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) return 'Please enter $hint';
-          if (hint == 'Phone Number' && value.trim().length != 10) return 'Enter a valid 10-digit number';
-          if (hint == 'Email Address' && !value.contains('@')) return 'Enter a valid email';
-          if (hint == 'Password' && value.length < 6) return 'Password must be at least 6 characters';
-          return null;
-        },
+        validator: validator,
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(color: white),
@@ -180,7 +229,8 @@ class _SignUpPageState extends State<SignUpPage> {
           )
               : null,
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         ),
       ),
     );

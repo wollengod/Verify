@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:http/http.dart' as http;
 import 'package:Verify/utilities/hex_color.dart';
+import 'dart:convert'; // REQUIRED
 
 import 'changing_pass.dart';
 class Otp extends StatefulWidget {
@@ -15,32 +16,65 @@ class Otp extends StatefulWidget {
 }
 
 class _OtpState extends State<Otp> {
+
   String _otp = "";
-  void verifyOTP() async {
+  bool _isLoading = false;
+  final _formkey = GlobalKey<FormState>();
+
+
+  Future<void> verifyOTP() async {
+    if (_otp.length != 6) {
+      showError("Enter valid 6-digit OTP");
+      return;
+    }
+
     final apiKey = "ceabde09-483f-11f0-a562-0200cd936042";
-    final url = Uri.parse(
-        "https://2factor.in/API/V1/$apiKey/SMS/VERIFY/${widget.sessionId}/$_otp"
-    );
 
-    final response = await http.get(url);
+    try {
+      final url = Uri.parse(
+        "https://2factor.in/API/V1/$apiKey/SMS/VERIFY/${widget.sessionId}/$_otp",
+      );
 
-    if (response.statusCode == 200) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Password()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Successfully Verified')));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Invalid OTP")),
-      );
+      final response = await http.get(url);
+
+      print(response.body);
+      // 🔥 ALWAYS decode response
+      final data = jsonDecode(response.body);
+
+      if (data["Status"] == "Success") {
+
+        showSuccess("OTP Verified Successfully");
+
+        // ✅ OTP correct
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Password(number: widget.number,)),
+        );
+
+      } else {
+        // ❌ Show backend message instead of status code
+        showError(data["Details"] ?? "Invalid OTP");
+      }
+
+    } catch (e) {
+      showError("Something went wrong");
     }
   }
 
+  void showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: Colors.red),
+    );
+  }
+
+  void showSuccess(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: Colors.green),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final _formkey = GlobalKey<FormState>();
     return SafeArea(
         child: Scaffold(
             backgroundColor: "#001234".toColor(),
@@ -65,27 +99,39 @@ class _OtpState extends State<Otp> {
                                 length: 6,
                                 onChanged: (value) => _otp = value,
                                 onCompleted: (value) => _otp = value,
+                                validator: (value) {
+                                  if (value == null || value.length != 6) {
+                                    return "Enter 6-digit OTP";
+                                  }
+                                  return null;
+                                },
                               ),
-                              const SizedBox(height: 20,),
-                              Row(
-                                children: [
-                                  Text('Resend OTP',style: TextStyle(color: Colors.grey.shade700),),
-                                ],
-                              ),
-                              const SizedBox(height: 40,),
-                              ElevatedButton(onPressed: (){
-                                if(_formkey.currentState!.validate()){
-                                  verifyOTP();
-                                }
-                                else{
-                                  print('Not working');
-                                }
-                              },
+                              const SizedBox(height: 60,),
+                              ElevatedButton(
+                                onPressed: _isLoading
+                                    ? null
+                                    : () async {
+                                  if (_formkey.currentState!.validate()) {
+                                    setState(() => _isLoading = true);
+                                    await verifyOTP();
+                                    if (mounted) {
+                                      setState(() => _isLoading = false);
+                                    }                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
-                                  foregroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                  backgroundColor: Theme.of(context).textTheme.bodyMedium!.color,
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Theme.of(context).primaryColor,
                                 ),
-                                child: const Text('Confirm',),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.black,
+                                  ),
+                                )
+                                    : const Text("Confirm"),
                               ),
                             ],
                           ),

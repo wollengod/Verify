@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,23 +21,49 @@ class Full_Property extends StatefulWidget {
 }
 
 class _Full_PropertyState extends State<Full_Property> {
+
   Future<List<DetailedPropertyModel>>_propertyFuture = Future.value([]);
   late Future<List<RealEstateSlider>> _sliderFuture;
+  final bookingDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
   bool isBooked = false;
+  Map? bookingData;
 
   @override
   void initState() {
     super.initState();
     _loadAllData();
 
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+
+    super.dispose();
   }
 
   Future<void> _loadAllData() async {
     final id = await getPropertyID();
+
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt("id")?.toString() ?? "0";
+
     setState(() {
       _propertyFuture = fetchProperty(id);
       _sliderFuture = fetchSlider(id);
     });
+
+    if (id != null) {
+      await checkIfBooked(id, userId);
+    }
   }
 
   Future<String?> getPropertyID() async {
@@ -88,8 +115,28 @@ class _Full_PropertyState extends State<Full_Property> {
     }
   }
 
-  final bookingDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+  Future<void> checkIfBooked(String propertyId, String userId) async {
+    final url = Uri.parse(
+        "https://verifyrealestateandservices.in/Second%20PHP%20FILE/book_shedual/show_api_for_property_id_and_user_id.php?property_id=$propertyId&user_ids=$userId"
+    );
 
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data["status"] == true) {
+        setState(() {
+          isBooked = true;
+          bookingData = data["data"][0]; // 🔥 IMPORTANT
+        });
+      } else {
+        setState(() {
+          isBooked = false;
+        });
+      }
+    }
+  }
 
   Future<void> bookSchedule({
     required String id,
@@ -137,8 +184,10 @@ class _Full_PropertyState extends State<Full_Property> {
         isBooked = true;
       });
 
-      _showSuccessDialog();
-
+      _showSuccessDialog(
+        date: visitingDate,
+        time: visitingTime,
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Booking Failed: ${response.body}')),
@@ -146,12 +195,13 @@ class _Full_PropertyState extends State<Full_Property> {
     }
   }
 
-  void _showSuccessDialog() {
+  void _showSuccessDialog({String? date, String? time}) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
           decoration: BoxDecoration(
@@ -162,46 +212,102 @@ class _Full_PropertyState extends State<Full_Property> {
             mainAxisSize: MainAxisSize.min,
             children: [
 
-              // Success Icon Container
+              // 🔥 Success Circle with subtle glow
               Container(
-                height: 80,
-                width: 80,
+                height: 90,
+                width: 90,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: "#001234".toColor().withOpacity(0.08),
                 ),
-                child: Icon(
-                  Icons.check_rounded,
-                  size: 42,
+                child: Center(
+                  child: Icon(
+                    Icons.check_rounded,
+                    size: 48,
+                    color: "#001234".toColor(),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+               Text(
+                "Visit Scheduled!",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
                   color: "#001234".toColor(),
                 ),
               ),
 
-              const SizedBox(height: 22),
+              const SizedBox(height: 10),
 
+              // 🔹 Subtitle
               const Text(
-                "Visit Scheduled!",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.2,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              const Text(
-                "Our property advisor will contact you shortly to confirm your visit details.",
+                "Your visit has been successfully booked.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.5,
-                  color: Colors.black54,
-                  height: 1.5,
+                  color: Colors.black87,
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 20),
 
+              // 🔹 Booking Summary Card
+              if (date != null || time != null)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: "#EEF5FF".toColor(),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+
+                      if (date != null)
+                        _dialogInfoRow(Icons.calendar_today, "Date", date),
+
+                      if (time != null) ...[
+                        const SizedBox(height: 8),
+                        _dialogInfoRow(Icons.access_time, "Time Slot", time),
+                      ],
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: 20),
+
+              // 🔹 Info Message
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: "#001234".toColor().withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.info_outline,
+                        size: 18,
+                        color: "#001234".toColor()),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "Our property advisor will contact you shortly to confirm your visit.",
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 26),
+
+              // 🔹 Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -230,6 +336,33 @@ class _Full_PropertyState extends State<Full_Property> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _dialogInfoRow(IconData icon, String title, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: "#001234".toColor()),
+        const SizedBox(width: 8),
+        Text(
+          "$title:",
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 13.5,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13.5,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -363,12 +496,17 @@ class _Full_PropertyState extends State<Full_Property> {
                             color: "#001234".toColor(),
                             fontWeight: FontWeight.bold)),
                     ElevatedButton(
-                      onPressed: isBooked
-                        ? null
-                        : () async {
-                        final bookingData = await _showBookingBottomSheet();
+                      onPressed: () async {
+                        if (isBooked) {
+                          if (bookingData != null) {
+                            showVisitDetails(bookingData!);
+                          }
+                          return;
+                        }
 
-                        if (bookingData == null) return;
+                        final bookingDataSheet = await _showBookingBottomSheet();
+
+                        if (bookingDataSheet == null) return;
 
                         final propertyList = await _propertyFuture;
                         if (propertyList.isEmpty) return;
@@ -393,38 +531,26 @@ class _Full_PropertyState extends State<Full_Property> {
                           type: property.typeOfProperty,
                           fieldworkerName: property.fieldworkerName,
                           fieldworkerNumber: property.fieldworkerNumber,
-                          visitingDate: bookingData["date"]!,
-                          visitingTime: bookingData["time"]!,
+                          visitingDate: bookingDataSheet["date"]!,
+                          visitingTime: bookingDataSheet["time"]!,
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isBooked
-                          ? "#001234".toColor().withOpacity(0.85)
+                          ? "#E3EFFF".toColor()
                             : "#001234".toColor(),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),
                         ),
                       ),
                       child: Text(
-                        isBooked ? "Visit Scheduled" : "Book Schedule",
+                        isBooked ? "View Details" : "Book Schedule",
                         style: TextStyle(
-                          color: isBooked ?  Colors.white : "#001234".toColor(),
+                          color: isBooked ?  "#001234".toColor() :   Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     )
-
-                    // ElevatedButton(
-                    //   onPressed: data.Rent.isNotEmpty ? () {} : null,
-                    //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor: "#001234".toColor(),
-                    //     shape: RoundedRectangleBorder(
-                    //         borderRadius: BorderRadius.circular(40)),
-                    //   ),
-                    //   child: Text(data.Rent.isNotEmpty ? "Book Schedule" : "Unavailable",
-                    //       style: GoogleFonts.poppins(
-                    //           fontWeight: FontWeight.w500, color: Colors.grey)),
-                    // )
                   ],
                 ),
               ),
@@ -436,7 +562,40 @@ class _Full_PropertyState extends State<Full_Property> {
 
   Future<Map<String, String>?> _showBookingBottomSheet() async {
     DateTime? selectedDate;
-    TimeOfDay? selectedTime;
+    String? selectedSlot;
+    List<String> timeSlots = [
+      "09:00 AM - 11:00 AM",
+      "11:00 AM - 01:00 PM",
+      "02:00 PM - 04:00 PM",
+      "04:00 PM - 06:00 PM",
+      "06:00 PM - 08:00 PM",
+    ];
+
+    bool isSlotExpired(String slot) {
+      final now = DateTime.now();
+
+      // Only apply for today
+      if (selectedDate == null ||
+          DateFormat('yyyy-MM-dd').format(selectedDate!) !=
+              DateFormat('yyyy-MM-dd').format(now)) {
+        return false;
+      }
+
+      // Extract slot start time
+      final startTime = slot.split('-')[0].trim(); // "09:00 AM"
+
+      final parsedTime = DateFormat("hh:mm a").parse(startTime);
+
+      final slotDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        parsedTime.hour,
+        parsedTime.minute,
+      );
+
+      return slotDateTime.isBefore(now);
+    }
 
     return await showModalBottomSheet<Map<String, String>>(
       context: context,
@@ -517,48 +676,69 @@ class _Full_PropertyState extends State<Full_Property> {
 
                   const SizedBox(height: 12),
 
-                  // TIME CARD
-                  _selectCard(
-                    icon: Icons.access_time,
-                    title: selectedTime == null
-                        ? "Select Visiting Time"
-                        : selectedTime!.format(context),
-                    onTap: () async {
-                      final picked = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              timePickerTheme: TimePickerThemeData(
-                                backgroundColor: Colors.white,
-                                hourMinuteShape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                hourMinuteColor: "#EEF5FF".toColor(),
-                                dialHandColor: "#001234".toColor(),
-                                dialBackgroundColor: "#EEF5FF".toColor(),
-                                entryModeIconColor: "#001234".toColor(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Select Time Slot",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: "#001234".toColor(),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: timeSlots.map((slot) {
+                          final isSelected = selectedSlot == slot;
+
+                          final isExpired = isSlotExpired(slot);
+
+                          return GestureDetector(
+                            onTap: isExpired
+                                ? null
+                                : () {
+                              setModalState(() {
+                                selectedSlot = slot;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: isExpired
+                                    ? Colors.grey.shade300
+                                    : isSelected
+                                    ? "#001234".toColor()
+                                    : "#EEF5FF".toColor(),
+
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              colorScheme: ColorScheme.light(
-                                primary: "#001234".toColor(),
-                                onPrimary: "#001234".toColor(),
-                                onSurface: Colors.black87,
-                              ),
-                              textButtonTheme: TextButtonThemeData(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: "#001234".toColor(),
-                                ),
+                              child:
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.access_time,
+                                      size: 16,
+                                      color: isSelected ? Colors.white : Colors.black54),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    slot,
+                                    style: TextStyle(
+                                      color: isSelected ? Colors.white : Colors.black87,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: child!,
                           );
-                        },
-                      );
-                      if (picked != null) {
-                        setModalState(() => selectedTime = picked);
-                      }
-                    },
+                        }).toList(),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 30),
@@ -572,7 +752,7 @@ class _Full_PropertyState extends State<Full_Property> {
                       ),
                     ),
                     onPressed: () {
-                      if (selectedDate == null || selectedTime == null) {
+                      if (selectedDate == null || selectedSlot  == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text("Please select date and time")),
@@ -583,7 +763,7 @@ class _Full_PropertyState extends State<Full_Property> {
                       Navigator.pop(context, {
                         "date":
                         DateFormat('yyyy-MM-dd').format(selectedDate!),
-                        "time": selectedTime!.format(context),
+                        "time": selectedSlot!,
                       });
                     },
                     child: const Text(
@@ -599,6 +779,157 @@ class _Full_PropertyState extends State<Full_Property> {
           },
         );
       },
+    );
+
+  }
+
+  void showVisitDetails(Map bookingData) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              // 🔹 Drag Handle
+              Container(
+                height: 5,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🔹 Title
+              Row(
+                children: [
+                  Icon(Icons.event_available, color: "#001234".toColor()),
+                  const SizedBox(width: 8),
+                  Text(
+                    "Visit Scheduled",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: "#001234".toColor(),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🔹 Info Card
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: "#EEF5FF".toColor(),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+
+                    _infoRow(Icons.calendar_today, "Date",
+                        bookingData['visiting_date'] ?? "Pending"),
+
+                    const SizedBox(height: 10),
+
+                    _infoRow(Icons.access_time, "Time",
+                        bookingData['visiting_time'] ?? "Pending"),
+
+                    const SizedBox(height: 10),
+
+                    _infoRow(Icons.location_on, "Location",
+                        bookingData['locations'] ?? "-"),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🔹 Agent Name (optional)
+              if (bookingData['fieldworkar_name'] != null)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.black12),
+                  ),
+                  child: _infoRow(
+                    Icons.person,
+                    "Agent",
+                    bookingData['fieldworkar_name'],
+                  ),
+                ),
+
+              const SizedBox(height: 20),
+
+              // 🔹 Message Box (IMPORTANT UX)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: "#001234".toColor().withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: "#001234".toColor()),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "Our property advisor will contact you shortly to confirm your visit.",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 15),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _infoRow(IconData icon, String title, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: "#001234".toColor()),
+        const SizedBox(width: 10),
+        Text(
+          "$title:",
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -659,11 +990,11 @@ class _Full_PropertyState extends State<Full_Property> {
 
   Widget buildStaticInfoSection(String floor,String Age,String total_floor,metro,metro_distance,road,market_distance,id) {
     final List<Map<String, dynamic>> infoList = [
-      {
-        'icon': Icons.add_card,
-        'title': 'ID',
-        'value': id,
-      },
+      // {
+      //   'icon': Icons.add_card,
+      //   'title': 'ID',
+      //   'value': id,
+      // },
       {
         'icon': Icons.train,
         'title': 'Nearest Metro',
@@ -877,4 +1208,5 @@ class _Full_PropertyState extends State<Full_Property> {
       ],
     );
   }
+
 }

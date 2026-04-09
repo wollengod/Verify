@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:Verify/utilities/hex_color.dart';
 import '../../custom_widget/Paths.dart';
@@ -20,42 +23,74 @@ class _ForgetState extends State<Forget> {
   Future<void> checkNumberAndSendOtp(String number) async {
     setState(() => _isLoading = true);
 
-    final apiKey = "ceabde09-483f-11f0-a562-0200cd936042";
-    final url = Uri.parse('https://verifyrealestateandservices.in/WebService4.asmx/CheckMobileNumber?FNumber=$number');
-    final response = await http.get(url);
+    try {
+      final apiKey = "ceabde09-483f-11f0-a562-0200cd936042";
 
-    if (response.statusCode == 200) {
-      final otpUrl = Uri.parse("https://2factor.in/API/V1/$apiKey/SMS/+91$number/AUTOGEN");
-      final otpResponse = await http.get(otpUrl);
+      final url = Uri.parse(
+          'https://verifyrealestateandservices.in/WebService4.asmx/CheckMobileNumber?FNumber=$number');
 
-      if (otpResponse.statusCode == 200) {
-        final sessionId = RegExp(r'"Details":"(.*?)"')
-            .firstMatch(otpResponse.body)
-            ?.group(1);
+      final response = await http.get(url);
 
-        if (sessionId != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Otp(number: number, sessionId: sessionId),
-            ),
-          );
+      if (response.statusCode == 200) {
+        final data = response.body;
+
+        // 🔥 Convert string response to JSON
+        final decoded = jsonDecode(data);
+
+        if (decoded is List && decoded.isNotEmpty) {
+          final status = decoded[0]["Status"];
+
+          if (status == 1) {
+            // ✅ Number exists → send OTP
+
+            final otpUrl = Uri.parse(
+                "https://2factor.in/API/V1/$apiKey/SMS/+91$number/AUTOGEN");
+
+            final otpResponse = await http.get(otpUrl);
+
+            if (otpResponse.statusCode == 200) {
+              final sessionId = RegExp(r'"Details":"(.*?)"')
+                  .firstMatch(otpResponse.body)
+                  ?.group(1);
+
+              if (sessionId != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        Otp(number: number, sessionId: sessionId),
+                  ),
+                );
+              } else {
+                showError("Failed to get session ID");
+              }
+            } else {
+              showError("Failed to send OTP");
+            }
+          } else {
+            // ❌ Number not found
+            showError("Mobile number not registered");
+          }
+        } else {
+          showError("Invalid server response");
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to send OTP")),
-        );
+        showError("Server error (${response.statusCode})");
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Mobile number not found")),
-      );
+    } catch (e) {
+      showError("Something went wrong");
     }
 
     setState(() => _isLoading = false);
   }
 
-  @override
+  void showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+    @override
   Widget build(BuildContext context) {
     return SafeArea(child: Scaffold(
       backgroundColor: "#001234".toColor(),
@@ -77,13 +112,16 @@ class _ForgetState extends State<Forget> {
           const SizedBox(height: 30),
 
           // Form Section
+
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 100),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                   Text(
+                  const SizedBox(height: 40),
+
+                  Text(
                     'Forgot Password',
                     style: TextStyle(
                       fontSize: 28,
@@ -92,16 +130,19 @@ class _ForgetState extends State<Forget> {
                       color: Theme.of(context).textTheme.bodyMedium!.color,
                     ),
                   ),
+
                   const SizedBox(height: 8),
+
                   Text(
                     'Enter your registered phone number to receive an OTP',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.grey.shade600,
+                      color: Colors.grey.shade500,
                       fontFamily: 'Poppins',
                     ),
                   ),
+
                   const SizedBox(height: 30),
 
                   // Phone Number Input
@@ -115,19 +156,43 @@ class _ForgetState extends State<Forget> {
                       ),
                       child: TextFormField(
                         controller: number,
+                        cursorColor: Colors.black,
                         keyboardType: TextInputType.phone,
-                        style:  TextStyle(color: Theme.of(context).scaffoldBackgroundColor,),
+                        style: const TextStyle(color: Colors.black),
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          border: InputBorder.none,
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
                           hintText: "Phone Number",
-                          hintStyle: TextStyle(color: Colors.grey.shade500),
-                          prefixIcon: const Icon(Icons.call, color: Colors.black),
+                          hintStyle: TextStyle(color: Colors.black,),
+                          prefixIcon: const Icon(Icons.call,color: Colors.black,),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade400),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade400),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).primaryColor,
+                              width: 1.5,
+                            ),
+                          ),
                         ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Enter your phone number';
-                          if (value.length != 10) return 'Phone number must be 10 digits';
-                          if (!RegExp(r'^[6-9]\d{9}$').hasMatch(value)) return 'Invalid phone number';
+                          if (value == null || value.isEmpty) {
+                            return 'Enter phone number';
+                          }
+                          if (value.length != 10) {
+                            return 'Enter valid 10-digit number';
+                          }
                           return null;
                         },
                       ),
@@ -136,48 +201,43 @@ class _ForgetState extends State<Forget> {
                   const SizedBox(height: 30),
 
                   // Continue Button
-                  GestureDetector(
-                    onTap: () async {
-                      if (_formKey.currentState!.validate()) {
-                        await checkNumberAndSendOtp(number.text);
-                      }
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-
-                          gradient: LinearGradient(
-                              colors: [
-                              ?Theme.of(context).textTheme.bodyMedium!.color,
-                          ?Theme.of(context).textTheme.bodyMedium!.color,
-                      ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    ),
-                        // boxShadow: [
-                        //   BoxShadow(
-                        //     color: Colors.black12,
-                        //     blurRadius: 5,
-                        //     offset: Offset(0, 2),
-                        //   ),
-                        // ],
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () async {
+                        if (_formKey.currentState!.validate()) {
+                          await checkNumberAndSendOtp(number.text);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor:  Theme.of(context).scaffoldBackgroundColor,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: Center(
-                        child: _isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                          "Send OTP",
-                          style: TextStyle(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
+                      child: _isLoading
+                          ? SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                        ),
+                      )
+                          : const Text(
+                        "Send OTP",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
                         ),
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

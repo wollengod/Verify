@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Verify/Themes/theme-helper.dart';
@@ -42,6 +43,11 @@ class _LoginPageState extends State<LoginPage> {
         Text(data['message'] ??'User Login Successfully'),
         ),
       );
+
+      final String? profileImage = data['user']['profile_image'];
+
+
+
       final String fullNameFromAPI = data['user']['FullName']; // fixed casing
       final String emailFromAPI = data['user']['Email'];       // fixed casing
       final int IDFromAPI = data['user']['id'];                // already an int
@@ -53,7 +59,13 @@ class _LoginPageState extends State<LoginPage> {
       await shared_pref.setString('number', mobileFromAPI);
       await shared_pref.setInt('id', IDFromAPI);
 
-      //profile(fullNameFromAPI,emailFromAPI,IDFromAPI);
+      if (profileImage != null && profileImage.isNotEmpty) {
+        String fullUrl =
+            "https://verifyrealestateandservices.in/Second%20PHP%20FILE/profie_image_update_main_realestate/$profileImage";
+
+        await shared_pref.setString('profile_image_url', fullUrl);
+      }
+
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)
       => Homepage(),
       ));
@@ -116,10 +128,18 @@ class _LoginPageState extends State<LoginPage> {
                           hint: 'Phone Number',
                           icon: Icons.call,
                           keyboardType: TextInputType.phone,
-                          validator: (value) =>
-                          value == null || value.isEmpty
-                              ? 'Enter phone number'
-                              : null,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly, // only numbers
+                            LengthLimitingTextInputFormatter(10),   // max 10 digits
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Enter phone number';
+                            } else if (value.length != 10) {
+                              return 'Enter valid 10-digit number';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 20),
 
@@ -232,6 +252,7 @@ class _LoginPageState extends State<LoginPage> {
     bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters, // 👈 add this
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -244,10 +265,16 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: isPassword && !_showPassword,
         keyboardType: keyboardType,
         validator: validator,
-        style:  TextStyle(color: Theme.of(context).textTheme.bodyMedium!.color,),
+        inputFormatters: inputFormatters, // 👈 use here
+        style: TextStyle(
+          color: Theme.of(context).textTheme.bodyMedium!.color,
+        ),
         decoration: InputDecoration(
           hintText: hint,
-          prefixIcon: Icon(icon, color: Theme.of(context).textTheme.bodyMedium!.color,),
+          prefixIcon: Icon(
+            icon,
+            color: Theme.of(context).textTheme.bodyMedium!.color,
+          ),
           suffixIcon: isPassword
               ? IconButton(
             icon: Icon(
@@ -263,7 +290,8 @@ class _LoginPageState extends State<LoginPage> {
               : null,
           border: InputBorder.none,
           hintStyle: TextStyle(color: Colors.grey.shade500),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         ),
       ),
     );
