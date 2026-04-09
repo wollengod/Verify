@@ -102,7 +102,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
                   SizedBox(height: 10),
                   Text(
                     "No results found",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,color: Colors.grey),
                   ),
                   Text(
                     "Try different keywords",
