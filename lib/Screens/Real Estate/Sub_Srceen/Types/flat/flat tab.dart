@@ -24,7 +24,7 @@ class FlatPropertyTabs extends StatelessWidget {
                 Tab(text: "Buy Flat"),
               ],
             ),
-            const Expanded(
+            const Flexible(
               child: TabBarView(
                 children: [
                   FlatPropertyPage(),
