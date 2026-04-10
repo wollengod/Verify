@@ -37,8 +37,6 @@ class _OtpState extends State<Otp> {
 
       final response = await http.get(url);
 
-      print(response.body);
-      // 🔥 ALWAYS decode response
       final data = jsonDecode(response.body);
 
       if (data["Status"] == "Success") {

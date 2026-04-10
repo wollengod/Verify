@@ -103,7 +103,6 @@ class _ProfileState extends State<Profile> {
       String? userId = prefs.getInt('id')?.toString();
 
       if (userId == null) {
-        print('User ID not found in SharedPreferences.');
         return;
       }
 
@@ -133,19 +132,14 @@ class _ProfileState extends State<Profile> {
             _profileImageUrl = fullUrl; // persistent
           });
 
-          print('Uploaded to: $fullUrl');
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(respJson['message'] ?? 'Upload successful')),
           );
         } else {
-          print('Upload failed: ${respJson['message']}');
         }
       } else {
-        print('Failed to upload. Status: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error uploading image: $e');
     }
   }
 
@@ -166,7 +160,6 @@ class _ProfileState extends State<Profile> {
 
     final imageUrl = sharedPref.getString('profile_image_url');
 
-    print("LOADED IMAGE URL: $imageUrl"); // 👈 DEBUG
 
     setState(() {
       name = sharedPref.getString('name') ?? '';

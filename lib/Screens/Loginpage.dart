@@ -36,7 +36,6 @@ class _LoginPageState extends State<LoginPage> {
             }
         ));
     final data= json.decode(response.body);
-    print("Response Body loginpage: ${response.body}");
     if(response.statusCode==200 && data['status'] == 'success'){
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content:
@@ -182,7 +181,6 @@ class _LoginPageState extends State<LoginPage> {
                               loginUser();
                             }
                             else{
-                              print('Not working');
                             }
                           },
                           child: Container(

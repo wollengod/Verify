@@ -39,7 +39,6 @@ class _SearchResultPageState extends State<SearchResultPage> {
 
     final response = await http.get(url); // ✅ changed to GET
 
-    print("Response: ${response.body}");
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);

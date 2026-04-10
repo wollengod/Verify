@@ -19,14 +19,11 @@ Future<void> initLocalNotifications() async {
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onDidReceiveNotificationResponse: (details) {
-        print('📩 Notification tapped: ${details.payload}');
-        // You can navigate to a screen here if needed
       });
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print("🔔 Background message: ${message.messageId}");
 }
 
 void main() async {
@@ -96,12 +93,10 @@ class MyApp extends StatelessWidget {
 
     // Get FCM token
     FirebaseMessaging.instance.getToken().then((token) {
-      print("📲 FCM Token: $token");
     });
 
     // Foreground notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      print("🔔 Foreground message: ${message.notification?.title}");
 
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
@@ -122,10 +117,7 @@ class MyApp extends StatelessWidget {
         );
       }
     });
-
-    // When app opened by tapping notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("📩 Notification clicked!");
     });
   }
 }

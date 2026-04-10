@@ -72,7 +72,6 @@ class _Full_PropertyState extends State<Full_Property> {
   }
 
   Future<List<DetailedPropertyModel>> fetchProperty(String? id) async {
-    print("Detail page Id: $id ");
     final response = await http.get(Uri.parse(
         "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_application/details_page.php?P_id=$id"));
 
@@ -99,7 +98,6 @@ class _Full_PropertyState extends State<Full_Property> {
   Future<List<RealEstateSlider>> fetchSlider(String? id) async {
     final response = await http.get(Uri.parse(
         "https://verifyrealestateandservices.in/Second%20PHP%20FILE/main_realestate_for_website/show_multiple_image_in_main_realestate.php?subid=$id"));
-    print("Slider Id: ${id}");
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);

@@ -140,7 +140,6 @@ class _FilterPropertyState extends State<FilterProperty> {
         throw Exception('Failed to load filtered data');
       }
     } catch (e) {
-      print("ERROR: $e");
       setState(() {
         isFiltering = false;
         noResult = true;

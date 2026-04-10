@@ -161,7 +161,6 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
           'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&types=geocode&language=en&components=country:in&key=$googleApiKey';
 
       final response = await http.get(Uri.parse(url));
-      print('Response: ${response.body}');
       if (response.statusCode == 200) {
 
         final data = json.decode(response.body);
@@ -179,6 +178,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
     showDialog(
       context: context,
       builder: (_) => Dialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -197,6 +197,7 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                    color: Colors.black54
                 ),
               ),
 
@@ -286,14 +287,11 @@ class _ServiceBookingPageState extends State<ServiceBookingPage> {
         ),
       );
     }
-    print(request.fields);
-
     setState(() => isLoading = true);
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-      print("➡️ BODY: ${response.body}");  // debug
       if (response.statusCode == 200 && response.body.contains("success")) {
         _showSuccessDialog();
       } else {

@@ -272,7 +272,6 @@ class _SignUpPageState extends State<SignUpPage> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['message'] ?? "Signup failed")));
         }
       } catch (e) {
-        print("Error parsing signup response: $e");
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Something went wrong.")));
       }
     }
