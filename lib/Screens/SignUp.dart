@@ -262,7 +262,7 @@ class _SignUpPageState extends State<SignUpPage> {
             await prefs.setBool(SplashScreenState.KEY_LOGIN, true);
             await prefs.setString('name', user['FullName']);
             await prefs.setString('email', user['Email']);
-            await prefs.setString('mobile', user['Mobile']);
+            await prefs.setString('number', user['Mobile']);
             await prefs.setInt('id', user['id']);
 
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Sign up successful")));

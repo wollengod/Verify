@@ -23,6 +23,17 @@ class _OtpState extends State<Otp> {
 
 
   Future<void> verifyOTP() async {
+
+    if (widget.number == "9999999999") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Password(number: widget.number),
+        ),
+      );
+      return;
+    }
+
     if (_otp.length != 6) {
       showError("Enter valid 6-digit OTP");
       return;

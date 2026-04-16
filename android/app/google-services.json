@@ -9,7 +9,26 @@
       "client_info": {
         "mobilesdk_app_id": "1:827405616145:android:8f611fe240336274881db0",
         "android_client_info": {
-          "package_name": "com.Verify.verify"
+          "package_name": "com.swaven.verify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClPGpKJarIzQlaq_9QKAt4A1eOqpLfs3Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:827405616145:android:f2f728d03a6d9912881db0",
+        "android_client_info": {
+          "package_name": "com.swaven.verifyapp"
         }
       },
       "oauth_client": [],
