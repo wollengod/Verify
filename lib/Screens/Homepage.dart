@@ -4,10 +4,7 @@ import 'package:Verify/Screens/Real%20Estate/filter.dart';
 import 'package:Verify/Screens/profile.dart';
 import 'package:Verify/utilities/hex_color.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../custom_widget/Paths.dart';
-import 'Notification_page.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
